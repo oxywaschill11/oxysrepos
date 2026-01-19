@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CashFlow Capitals: Ultimate Edition </title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --primary: #6C63FF; --bg: #f0f2f5; --card: #ffffff; --gold: #FFD700; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 600px; width: 100%; }
+
+        /* CARDS */
+        .card { background: var(--card); padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; border-bottom: 4px solid var(--primary); }
+        
+        /* HEADER & BADGES */
+        .header { background: linear-gradient(135deg, #4b6cb7, #182848); color: white; text-align: center; border:none; padding-bottom: 30px; }
+        
+        .medal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
+        .medal-wrapper { display: flex; flex-direction: column; align-items: center; }
+        
+        .medal { 
+            background: rgba(255,255,255,0.2); border-radius: 50%; width: 55px; height: 55px; 
+            display: flex; align-items: center; justify-content: center; font-size: 26px; 
+            opacity: 0.5; filter: grayscale(100%); transition: all 0.4s ease; 
+            border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
+        .medal.unlocked { opacity: 1; filter: grayscale(0%); transform: scale(1.1); background: white; box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); border-color: #FFD700; }
+        .medal-name { font-size: 10px; font-weight: bold; text-transform: uppercase; margin-top: 5px; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; }
+
+        /* SECRET BADGE */
+        .medal.secret { font-family: monospace; font-weight: bold; color: #fff; font-size: 30px; }
+
+        /* BREAKDOWN GRID (NEW) */
+        .breakdown-container { display: flex; gap: 10px; margin-top: 15px; }
+        .breakdown-box { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; }
+        .bd-needs { background: #ffebee; border: 1px solid #ffcdd2; color: #c62828; }
+        .bd-wants { background: #e3f2fd; border: 1px solid #bbdefb; color: #1565c0; }
+        .sub-item { display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 2px; }
+
+        /* SLIDERS & INPUTS */
+        input[type="number"], input[type="text"], select { width: 100%; padding: 12px; margin: 5px 0; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .slider-container { margin: 15px 0; }
+        .slider-label { display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; color: #555; }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--primary); }
+
+        /* BUTTONS */
+        .mode-switch { display: flex; gap: 10px; margin-bottom: 20px; }
+        .mode-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; background: white; color: #555; transition: 0.3s; }
+        .mode-btn.active { background: var(--primary); color: white; transform: scale(1.02); box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3); }
+        button.action-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; background: var(--primary); margin-top: 10px; font-size: 16px; }
+        
+        /* MAGIC BUTTON */
+        .magic-btn { background: linear-gradient(45deg, #FF512F, #DD2476); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; margin-top: 10px; font-weight: bold; animation: pulse 2s infinite; font-size: 14px; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+
+        /* NO SPEND */
+        .streak-counter { font-size: 45px; font-weight: 800; color: var(--primary); text-align: center; margin: 10px 0; }
+        .timer-box { background: #333; color: #00ff00; font-family: monospace; padding: 10px; border-radius: 5px; text-align: center; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="card header">
+        <div style="display:flex; justify-content:space-between;">
+            <span id="levelBadge" style="font-weight:bold; background:rgba(0,0,0,0.2); padding:5px 10px; border-radius:15px;">Level 1</span>
+            <button onclick="hardReset()" style="background:none; border:none; color:white; cursor:pointer; opacity:0.8;">Reset ↻</button>
+        </div>
+        <h2> CashFlow Capitals</h2>
+        
+        <div style="background:rgba(0,0,0,0.2); height:10px; border-radius:5px; margin-top:5px;">
+            <div id="xpBar" style="background:#00e676; height:100%; width:0%; border-radius:5px; transition:width 0.5s; box-shadow: 0 0 10px #00e676;"></div>
+        </div>
+        <p id="xpNextText" style="font-size:12px; margin-top:5px; opacity:0.9;">100 XP to next level</p>
+        
+        <div class="medal-grid">
+            <div class="medal-wrapper"><div class="medal" id="b0">👑</div><span class="medal-name">Starter</span></div>
+            <div class="medal-wrapper"><div class="medal" id="b1">💰</div><span class="medal-name">Saver</span></div>
+            <div class="medal-wrapper"><div class="medal secret" id="b2">?</div><span class="medal-name" id="b2name">Secret</span></div>
+            
+            <div class="medal-wrapper"><div class="medal" id="b3">📊</div><span class="medal-name">Planner</span></div>
+            <div class="medal-wrapper"><div class="medal" id="b4">⏳</div><span class="medal-name">Time Lord</span></div>
+            <div class="medal-wrapper"><div class="medal" id="b5">⭐</div><span class="medal-name">Level 5</span></div>
+            <div class="medal-wrapper"><div class="medal" id="b6">🧘</div><span class="medal-name">Monk</span></div>
+            <div class="medal-wrapper"><div class="medal" id="b7">🚀</div><span class="medal-name">Rich Kid</span></div>
+        </div>
+    </div>
+
+    <div class="mode-switch">
+        <button class="mode-btn active" onclick="setMode('regular')" id="btnRegular">Plan & Breakdown</button>
+        <button class="mode-btn" onclick="setMode('nospend')" id="btnNoSpend"> No Spend</button>
+    </div>
+
+    <div id="regularMode">
+        
+        <div class="card">
+            <h3> 1. Money & Goal</h3>
+            <input type="number" id="income" placeholder="Monthly Pocket Money (₹)">
+            
+            <p style="font-size:12px; font-weight:bold; color:#555; margin-top:10px;">Goal (Optional):</p>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="customName" placeholder="Item Name (e.g. PS5)">
+                <input type="number" id="goalPrice" placeholder="Price (₹)">
+            </div>
+            
+            <div style="display:flex; align-items:center; gap:10px; margin-top:10px; font-size:12px;">
+                <input type="checkbox" id="includeGoal" checked onchange="updateChart()">
+                <label>Show Goal in Chart?</label>
+            </div>
+
+            <button class="action-btn" onclick="updateChart()">Update Chart & Breakdown </button>
+        </div>
+
+        <div class="card" id="sliderCard">
+            <h3> 2. Adjust & Visualize</h3>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Needs</span> <span id="lblNeeds">50%</span></div>
+                <input type="range" id="rngNeeds" min="0" max="100" value="50" oninput="autoBalance('needs')">
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label"><span>Wants</span> <span id="lblWants">30%</span></div>
+                <input type="range" id="rngWants" min="0" max="100" value="30" oninput="autoBalance('wants')">
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label"><span style="color:#00C851;">Savings</span> <span id="lblSave" style="color:#00C851;">20%</span></div>
+                <input type="range" id="rngSave" min="0" max="100" value="20" oninput="autoBalance('save')">
+            </div>
+
+            <div id="breakdownSection" style="display:none;">
+                <h4 style="margin:15px 0 5px 0;"> Where does the money go?</h4>
+                <div class="breakdown-container">
+                    <div class="breakdown-box bd-needs" id="needsList">
+                        </div>
+                    <div class="breakdown-box bd-wants" id="wantsList">
+                        </div>
+                </div>
+            </div>
+
+            <div id="chartContainer" style="margin-top:20px;">
+                <canvas id="stdChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card" style="border-bottom-color: #FF512F;">
+            <h3> 3. Time Challenge</h3>
+            <p style="color:#666;">I want to buy this item in...</p>
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="targetMonths" placeholder="e.g. 3">
+                <span style="padding:15px 0; font-weight:bold;">Months</span>
+            </div>
+            <button class="action-btn" style="background:#2c3e50;" onclick="checkFeasibility()">Check Feasibility</button>
+            <div id="timeResult" style="display:none; margin-top:15px; background:#fff3e0; padding:15px; border-radius:10px;"></div>
+        </div>
+    </div>
+
+    <div id="noSpendMode" style="display:none;">
+        <div class="card" style="text-align: center;">
+            <h3> 24-Hour No Spend</h3>
+            <div class="streak-counter">Day <span id="dayCount">1</span></div>
+            <div id="actionButtons">
+                <p>Did you spend on 'Wants' today?</p>
+                <div style="display:flex; gap:10px;">
+                    <button class="action-btn" style="background:#00C851" onclick="passDay()">NO (Saved)</button>
+                    <button class="action-btn" style="background:#ff4444" onclick="failChallenge()">YES (Spent)</button>
+                </div>
+            </div>
+            <div id="cooldownSection" style="display:none;">
+                <p>Come back tomorrow!</p>
+                <div class="timer-box" id="timerDisplay">Next check-in: 00:00:00</div>
+            </div>
+            <div id="challengeDead" style="display:none;">
+                <div style="border:2px solid red; background:#ffe6e6; padding:10px; border-radius:10px; color:red;">
+                     GAME OVER<br>You spent: <span id="spentAmountDisplay"></span>
+                </div>
+                <button class="action-btn" onclick="restartChallenge()" style="margin-top:15px;">Restart</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- STATE ---
+    let xp = parseInt(localStorage.getItem('xp')) || 0;
+    let level = parseInt(localStorage.getItem('level')) || 1;
+    let streak = parseInt(localStorage.getItem('streak')) || 1;
+    let isOut = localStorage.getItem('isOut') === 'true';
+    let lastCheckIn = parseInt(localStorage.getItem('lastCheckIn')) || 0;
+    let badges = JSON.parse(localStorage.getItem('badges')) || Array(8).fill(false);
+    let myChart = null;
+
+    window.onload = function() {
+        updateXP(); updateBadges(); checkCooldown();
+        if(isOut) showGameOverUI(localStorage.getItem('lastSpent'));
+        document.getElementById('dayCount').innerText = streak;
+        setInterval(checkCooldown, 60000);
+        updateChart();
+    };
+
+    function setMode(mode) {
+        document.getElementById('regularMode').style.display = mode === 'regular' ? 'block' : 'none';
+        document.getElementById('noSpendMode').style.display = mode === 'nospend' ? 'block' : 'none';
+        document.getElementById('btnRegular').className = mode === 'regular' ? 'mode-btn active' : 'mode-btn';
+        document.getElementById('btnNoSpend').className = mode === 'nospend' ? 'mode-btn active' : 'mode-btn';
+    }
+
+    // --- CHART & BREAKDOWN LOGIC ---
+    function updateChart() {
+        let n = parseInt(document.getElementById('rngNeeds').value);
+        let w = parseInt(document.getElementById('rngWants').value);
+        let s = parseInt(document.getElementById('rngSave').value);
+        let inc = parseFloat(document.getElementById('income').value) || 0;
+
+        // Render Chart
+        let goalName = document.getElementById('customName').value;
+        let showGoal = document.getElementById('includeGoal').checked;
+        let saveLabel = (goalName && showGoal) ? `Savings (${goalName})` : "Savings";
+
+        if(myChart) myChart.destroy();
+        myChart = new Chart(document.getElementById('stdChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Needs', 'Wants', saveLabel],
+                datasets: [{ data: [n, w, s], backgroundColor: ['#ff4444', '#33b5e5', '#00C851'] }]
+            }
+        });
+
+        // UPDATE BREAKDOWN LIST
+        if(inc > 0) {
+            document.getElementById('breakdownSection').style.display = "block";
+            let needsTotal = inc * (n/100);
+            let wantsTotal = inc * (w/100);
+
+            // Needs Breakdown (Approximate divisions)
+            let bFood = (needsTotal * 0.4).toFixed(0);
+            let bBooks = (needsTotal * 0.3).toFixed(0);
+            let bStat = (needsTotal * 0.3).toFixed(0);
+
+            // Wants Breakdown
+            let bFash = (wantsTotal * 0.25).toFixed(0);
+            let bToys = (wantsTotal * 0.25).toFixed(0);
+            let bElec = (wantsTotal * 0.25).toFixed(0);
+            let bSubs = (wantsTotal * 0.25).toFixed(0);
+
+            document.getElementById('needsList').innerHTML = `
+                <div style="font-weight:bold; margin-bottom:5px;">NEEDS (₹${needsTotal.toFixed(0)})</div>
+                <div class="sub-item"><span> Food</span> <span>₹${bFood}</span></div>
+                <div class="sub-item"><span> Books</span> <span>₹${bBooks}</span></div>
+                <div class="sub-item"><span> Stationery</span> <span>₹${bStat}</span></div>
+            `;
+
+            document.getElementById('wantsList').innerHTML = `
+                <div style="font-weight:bold; margin-bottom:5px;">WANTS (₹${wantsTotal.toFixed(0)})</div>
+                <div class="sub-item"><span> Fashion</span> <span>₹${bFash}</span></div>
+                <div class="sub-item"><span> Toys</span> <span>₹${bToys}</span></div>
+                <div class="sub-item"><span> Electronics</span> <span>₹${bElec}</span></div>
+                <div class="sub-item"><span> Subscriptions</span> <span>₹${bSubs}</span></div>
+            `;
+            unlockBadge(0); // Starter badge
+        }
+    }
+
+    function autoBalance(changed) {
+        let n = parseInt(document.getElementById('rngNeeds').value);
+        let w = parseInt(document.getElementById('rngWants').value);
+        let s = parseInt(document.getElementById('rngSave').value);
+
+        if(changed === 'save') {
+            let remaining = 100 - s;
+            if(w > remaining) { w = remaining; n = 0; } else { n = remaining - w; }
+        } else if (changed === 'needs') {
+            let remaining = 100 - n;
+            if(w > remaining) { w = remaining; s = 0; } else { s = remaining - w; }
+        } else if (changed === 'wants') {
+            let remaining = 100 - w;
+            if(s > remaining) { s = remaining; n = 0; } else { n = remaining - s; }
+        }
+
+        document.getElementById('rngNeeds').value = n; document.getElementById('rngWants').value = w; document.getElementById('rngSave').value = s;
+        document.getElementById('lblNeeds').innerText = n + "%"; document.getElementById('lblWants').innerText = w + "%"; document.getElementById('lblSave').innerText = s + "%";
+        
+        updateChart();
+    }
+
+    // --- TIME CHALLENGE ---
+    function checkFeasibility() {
+        let inc = parseFloat(document.getElementById('income').value);
+        let price = parseFloat(document.getElementById('goalPrice').value);
+        let months = parseFloat(document.getElementById('targetMonths').value);
+        let currentSavePerc = parseInt(document.getElementById('rngSave').value);
+
+        if(!inc || !price || !months) return alert("Please fill in Income, Goal Price, and Target Months!");
+        let requiredMonthly = price / months;
+        let requiredPerc = (requiredMonthly / inc) * 100;
+        let actualMonthly = inc * (currentSavePerc / 100);
+        let div = document.getElementById('timeResult');
+        div.style.display = 'block';
+
+        if(requiredPerc > 100) {
+            div.innerHTML = ` <b>Impossible!</b><br>You need ₹${requiredMonthly.toFixed(0)}/mo, but you only earn ₹${inc}.`;
+            return;
+        }
+
+        if(actualMonthly >= requiredMonthly) {
+            div.innerHTML = ` <b>You are set!</b><br>Your current ${currentSavePerc}% savings is enough to buy it in ${months} months.`;
+            div.style.background = "#e8f5e9";
+        } else {
+            let neededPerc = Math.ceil(requiredPerc);
+            div.style.background = "#fff3e0";
+            div.innerHTML = `
+                 <b>Not enough savings!</b><br>
+                You need to increase Savings to <b>${neededPerc}%</b>.<br>
+                <button class="magic-btn" onclick="applyFix(${neededPerc})"> Auto-Set Sliders to ${neededPerc}%</button>
+            `;
+        }
+        unlockBadge(4); gainXP(10);
+    }
+
+    function applyFix(neededPerc) {
+        document.getElementById('rngSave').value = neededPerc;
+        autoBalance('save');
+        document.getElementById('timeResult').innerHTML = ` <b>Fixed!</b> Sliders adjusted.`;
+        document.getElementById('timeResult').style.background = "#e8f5e9";
+        document.getElementById('sliderCard').scrollIntoView({behavior: "smooth"});
+    }
+
+    // --- NO SPEND LOGIC ---
+    function checkCooldown() {
+        if(isOut) return;
+        let now = Date.now();
+        let diff = now - lastCheckIn;
+        let oneDay = 24 * 60 * 60 * 1000;
+        if (lastCheckIn > 0 && diff < oneDay) {
+            document.getElementById('actionButtons').style.display = 'none';
+            document.getElementById('cooldownSection').style.display = 'block';
+            let remaining = oneDay - diff;
+            let h = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+            let m = Math.floor((remaining / (1000 * 60)) % 60);
+            document.getElementById('timerDisplay').innerText = `Next check-in: ${h}h ${m}m`;
+        } else {
+            document.getElementById('actionButtons').style.display = 'block';
+            document.getElementById('cooldownSection').style.display = 'none';
+        }
+    }
+
+    function passDay() {
+        lastCheckIn = Date.now(); localStorage.setItem('lastCheckIn', lastCheckIn);
+        streak++; localStorage.setItem('streak', streak);
+        document.getElementById('dayCount').innerText = streak;
+        alert(" Streak Saved!"); gainXP(30); checkCooldown();
+        if(streak>=7) unlockBadge(2); // Unlocks the SECRET badge
+        unlockBadge(6);
+    }
+    
+    function failChallenge() {
+        let spent = prompt("How much did you spend?");
+        if(spent) { isOut = true; localStorage.setItem('isOut', 'true'); localStorage.setItem('lastSpent', spent); showGameOverUI(spent); }
+    }
+
+    function showGameOverUI(amt) {
+        document.getElementById('actionButtons').style.display = 'none'; document.getElementById('cooldownSection').style.display = 'none';
+        document.getElementById('challengeDead').style.display = 'block'; document.getElementById('spentAmountDisplay').innerText = "₹" + amt;
+    }
+
+    function restartChallenge() {
+        isOut = false; streak = 1; lastCheckIn = 0;
+        localStorage.setItem('streak', 1); localStorage.setItem('isOut', 'false'); localStorage.setItem('lastCheckIn', 0);
+        location.reload();
+    }
+
+    function gainXP(amt) { xp += amt; if(xp >= 100) { xp = 0; level++; alert("Level Up!"); if(level>=5) unlockBadge(5); } localStorage.setItem('xp', xp); localStorage.setItem('level', level); updateXP(); }
+    
+    function updateXP() {
+        document.getElementById('xpBar').style.width = xp + "%";
+        document.getElementById('levelBadge').innerText = "Level " + level;
+        document.getElementById('xpNextText').innerText = `${100 - xp} XP to next level`;
+    }
+    
+    function unlockBadge(idx) {
+        badges[idx] = true;
+        localStorage.setItem('badges', JSON.stringify(badges));
+        updateBadges();
+    }
+    
+    function updateBadges() {
+        badges.forEach((b, i) => {
+            if(b) {
+                document.getElementById('b'+i).classList.add('unlocked');
+                // SECRET BADGE REVEAL LOGIC
+                if(i === 2) {
+                    document.getElementById('b'+i).innerText = "🔥";
+                    document.getElementById('b2name').innerText = "Streak Master";
+                    document.getElementById('b'+i).classList.remove('secret');
+                }
+            }
+        });
+    }
+    function hardReset() { localStorage.clear(); location.reload(); }
+</script>
+
+</body>
+</html>
