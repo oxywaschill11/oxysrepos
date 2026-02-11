@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BBPS Cleanliness Tracker - Class 7</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #4ADE80;
+            --secondary: #38BDF8;
+            --accent: #F472B6;
+            --danger: #ef4444;
+            --dark: #1E293B;
+            --light: #F1F5F9;
+            --card-bg: #ffffff;
+            --gold: #FFD700;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 25px;
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 10px 25px rgba(74, 222, 128, 0.4);
+        }
+        h1 { margin: 0; font-weight: 800; letter-spacing: 1px; }
+        
+        .date-display {
+            background: rgba(255,255,255,0.25);
+            padding: 5px 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-top: 10px;
+            display: inline-block;
+            font-size: 1.1rem;
+        }
+
+        .quote-box {
+            margin-top: 10px;
+            font-style: italic;
+            opacity: 0.9;
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        /* --- Layout --- */
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        h2 { border-bottom: 3px solid var(--primary); display: inline-block; padding-bottom: 5px; margin-top: 0; }
+
+        /* --- Form Elements --- */
+        label { display: block; margin: 15px 0 5px; font-weight: 600; }
+        select, input[type="range"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        
+        .range-container { display: flex; align-items: center; justify-content: space-between; }
+        .score-display { font-weight: 800; color: var(--accent); font-size: 1.2rem; margin-left: 10px; }
+
+        .friday-toggle {
+            background: #fff3cd;
+            border: 2px solid #ffecb5;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        button { font-family: inherit; }
+        button.submit-btn {
+            background: var(--dark);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        button.submit-btn:hover { background: var(--accent); transform: translateY(-2px); }
+        button.submit-btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+
+        button.undo-btn {
+            background: transparent;
+            border: 2px dashed var(--danger);
+            color: var(--danger);
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            display: none; /* Hidden by default */
+        }
+        button.undo-btn:hover { background: #fef2f2; }
+
+        /* --- Admin Controls --- */
+        .admin-controls { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-top: 1px solid #eee; padding-top: 15px;}
+        .btn-small {
+            padding: 10px; border: none; border-radius: 8px; font-size: 0.85rem; cursor: pointer; color: white; font-weight: 600;
+        }
+        .btn-archive { background: #8b5cf6; grid-column: span 2; } /* Purple */
+        .btn-print { background: #3b82f6; grid-column: span 2; } /* Blue */
+
+        /* --- Class Reset Zone --- */
+        .class-reset-zone {
+            margin-top: 15px;
+            border: 1px solid #fee2e2;
+            background: #fff1f2;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .btn-danger-outline {
+            background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 8px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem;
+        }
+        .btn-danger-outline:hover { background: #fee2e2; }
+
+        /* --- Badges --- */
+        .badges-container { display: flex; gap: 15px; margin-bottom: 20px; }
+        .badge-card {
+            flex: 1;
+            background: linear-gradient(to right, #fdfbfb, #ebedee); 
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .badge-icon { font-size: 2rem; display: block; margin-bottom: 5px; }
+        .badge-title { font-size: 0.8rem; text-transform: uppercase; color: #666; letter-spacing: 1px; }
+        .badge-winner { font-size: 1.5rem; font-weight: 800; color: var(--dark); }
+
+        /* --- History Table --- */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #f8fafc; color: #64748b; font-size: 0.85rem; text-transform: uppercase; }
+        tr:hover { background-color: #f1f5f9; }
+
+        /* --- Print Styles --- */
+        @media print {
+            body { background: white; padding: 0; }
+            .no-print, .input-section, .admin-controls, .friday-toggle, .quote-box, .class-reset-zone, .undo-btn { display: none !important; }
+            .container { display: block; }
+            .card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+            canvas { max-height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>✨ BBPS Cleanliness Tracker ✨</h1>
+    <div class="date-display" id="header-date">Loading Date...</div>
+    <div class="quote-box" id="daily-quote">"Cleanliness is next to Godliness."</div>
+</header>
+
+<div class="container">
+    
+    <div class="input-section">
+        <div class="card">
+            <h2>📝 Judge's Panel</h2>
+            
+            <label>Select Class</label>
+            <select id="class-selector" onchange="checkDailyStatus(); updateDangerLabel();">
+                <option value="7A">7A</option>
+                <option value="7B">7B</option>
+                <option value="7C">7C</option>
+                <option value="7D">7D</option>
+                <option value="7E">7E</option>
+                <option value="7F">7F</option>
+                <option value="7G">7G</option>
+                <option value="7H">7H</option>
+                <option value="7I">7I</option>
+            </select>
+
+            <label class="friday-toggle">
+                <input type="checkbox" id="friday-mode" onchange="toggleFridayMode()">
+                <span>📅 Is it Friday? (Enable Cupboard Check)</span>
+            </label>
+
+            <div id="status-msg" style="text-align:center; color: var(--danger); font-weight:bold; font-size:0.9rem; margin:10px 0; display:none;">
+                ⚠️ Points already added for today!
+            </div>
+
+            <div id="input-fields-wrapper">
+                <label>🚰 Water Spilled / Cleanliness</label>
+                <div class="range-container">
+                    <input type="range" id="score-water" min="0" max="5" step="1" value="0" oninput="updateDisplays()">
+                    <span class="score-display" id="disp-water">0</span>
+                </div>
+
+                <label>📄 Papers on Ground</label>
+                <div class="range-container">
+                    <input type="range" id="score-paper" min="0" max="5" step="1" value="0" oninput="updateDisplays()">
+                    <span class="score-display" id="disp-paper">0</span>
+                </div>
+
+                <label>🪑 Table & Chair Arrangement</label>
+                <div class="range-container">
+                    <input type="range" id="score-arrange" min="0" max="5" step="1" value="0" oninput="updateDisplays()">
+                    <span class="score-display" id="disp-arrange">0</span>
+                </div>
+
+                <div id="friday-criteria" style="display:none; margin-top: 15px; border-top: 2px dashed #ddd; padding-top:10px;">
+                    <label>🚪 Cupboard Cleanliness (Weekly)</label>
+                    <div class="range-container">
+                        <input type="range" id="score-cupboard" min="0" max="5" step="1" value="0" oninput="updateDisplays()">
+                        <span class="score-display" id="disp-cupboard">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <button id="award-btn" class="submit-btn" onclick="addPoints()">✅ Award Points</button>
+            <button id="undo-btn" class="undo-btn" onclick="undoToday()">↩️ Undo Today's Entry for <span id="undo-class-name"></span></button>
+
+            <div class="admin-controls">
+                <button class="btn-small btn-print" onclick="window.print()">🖨️ Print Report</button>
+                <button class="btn-small btn-archive" onclick="endWeek()">🏆 End Week & Save History</button>
+            </div>
+
+            <div class="class-reset-zone">
+                <button class="btn-danger-outline" onclick="hardResetClass()">
+                    ⚠️ Reset Total Score for <span id="danger-class-label">7A</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="results-section">
+        
+        <div class="badges-container">
+            <div class="badge-card">
+                <span class="badge-icon">⭐</span>
+                <div class="badge-title">Latest Star</div>
+                <div class="badge-winner" id="badge-daily">-</div>
+            </div>
+            <div class="badge-card" style="border-color: var(--gold); background: #fffbe6;">
+                <span class="badge-icon">👑</span>
+                <div class="badge-title">Weekly Champion</div>
+                <div class="badge-winner" id="badge-weekly">-</div>
+            </div>
+            <div class="badge-card" style="border-color: var(--secondary); background: #f0f9ff;">
+                <span class="badge-icon">🌍</span>
+                <div class="badge-title">Yearly Leader</div>
+                <div class="badge-winner" id="badge-yearly">-</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Live Leaderboard (Current Week)</h2>
+            <canvas id="cleanChart"></canvas>
+        </div>
+
+        <div class="card">
+            <h2>📜 Archive (History Log)</h2>
+            <div style="max-height: 250px; overflow-y: auto;">
+                <table id="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date Archived</th>
+                            <th>Weekly Winner</th>
+                            <th>Yearly Leader</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body"></tbody>
+                </table>
+                <p id="no-history" style="text-align:center; color:#999; font-size:0.9rem; padding:10px;">No history data yet.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Data Initialization ---
+    const classes = ['7A', '7B', '7C', '7D', '7E', '7F', '7G', '7H', '7I'];
+    
+    const quotes = [
+        "Cleanliness is a state of purity, clarity, and precision.",
+        "When your environment is clean, you feel happy, motivated and healthy.",
+        "Green city, clean city, my dream city.",
+        "Don't call it a dream, call it a plan. Clean up!",
+        "External cleanliness creates internal peace.",
+        "Respect the ground you walk on. Keep it clean."
+    ];
+
+    let ctx = document.getElementById('cleanChart').getContext('2d');
+    let chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: classes,
+            datasets: [{
+                label: 'Weekly Points',
+                data: new Array(9).fill(0),
+                backgroundColor: [
+                    '#4ADE80', '#38BDF8', '#F472B6', '#A78BFA', '#FBBF24',
+                    '#4ADE80', '#38BDF8', '#F472B6', '#A78BFA'
+                ],
+                borderRadius: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // --- Core Functions ---
+
+    function getTodayDateString() {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date().toLocaleDateString('en-US', options);
+    }
+    
+    function getSimpleDateKey() {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    function loadData() {
+        document.getElementById('header-date').innerText = getTodayDateString();
+        document.getElementById('daily-quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+        let savedWeekly = JSON.parse(localStorage.getItem('bbps_weekly_scores'));
+        let savedHistory = JSON.parse(localStorage.getItem('bbps_history'));
+
+        if (savedWeekly) updateChart(savedWeekly);
+        if (savedHistory) renderHistoryTable(savedHistory);
+        
+        updateBadges();
+        checkDailyStatus();
+        updateDangerLabel();
+    }
+
+    function toggleFridayMode() {
+        const isFriday = document.getElementById('friday-mode').checked;
+        document.getElementById('friday-criteria').style.display = isFriday ? 'block' : 'none';
+    }
+
+    function updateDisplays() {
+        ['water', 'paper', 'arrange', 'cupboard'].forEach(id => {
+            document.getElementById(`disp-${id}`).innerText = document.getElementById(`score-${id}`).value;
+        });
+    }
+
+    function updateDangerLabel() {
+        document.getElementById('danger-class-label').innerText = document.getElementById('class-selector').value;
+    }
+
+    // --- CHECK STATUS ---
+    function checkDailyStatus() {
+        const selectedClass = document.getElementById('class-selector').value;
+        const dailyLog = JSON.parse(localStorage.getItem('bbps_daily_log')) || {};
+        const todayKey = getSimpleDateKey();
+
+        const awardBtn = document.getElementById('award-btn');
+        const undoBtn = document.getElementById('undo-btn');
+        const statusMsg = document.getElementById('status-msg');
+        const inputsWrapper = document.getElementById('input-fields-wrapper');
+
+        if (dailyLog[selectedClass] && dailyLog[selectedClass].date === todayKey) {
+            // Locked
+            awardBtn.disabled = true;
+            awardBtn.innerText = "❌ Done for Today";
+            inputsWrapper.style.opacity = "0.5";
+            inputsWrapper.style.pointerEvents = "none";
+            statusMsg.style.display = 'block';
+            undoBtn.style.display = 'block';
+            document.getElementById('undo-class-name').innerText = selectedClass;
+        } else {
+            // Unlocked
+            awardBtn.disabled = false;
+            awardBtn.innerText = "✅ Award Points";
+            inputsWrapper.style.opacity = "1";
+            inputsWrapper.style.pointerEvents = "auto";
+            statusMsg.style.display = 'none';
+            undoBtn.style.display = 'none';
+        }
+    }
+
+    // --- ADD POINTS ---
+    function addPoints() {
+        const selectedClass = document.getElementById('class-selector').value;
+        
+        const dailyLog = JSON.parse(localStorage.getItem('bbps_daily_log')) || {};
+        const todayKey = getSimpleDateKey();
+        if (dailyLog[selectedClass] && dailyLog[selectedClass].date === todayKey) {
+            alert("Points already awarded today! Please reset first if needed.");
+            return;
+        }
+
+        const water = parseInt(document.getElementById('score-water').value);
+        const paper = parseInt(document.getElementById('score-paper').value);
+        const arrange = parseInt(document.getElementById('score-arrange').value);
+        let total = water + paper + arrange;
+
+        if (document.getElementById('friday-mode').checked) {
+            total += parseInt(document.getElementById('score-cupboard').value);
+        }
+
+        let currentScores = JSON.parse(localStorage.getItem('bbps_weekly_scores')) || {};
+        if (!currentScores[selectedClass]) currentScores[selectedClass] = 0;
+        currentScores[selectedClass] += total;
+        localStorage.setItem('bbps_weekly_scores', JSON.stringify(currentScores));
+
+        let yearlyScores = JSON.parse(localStorage.getItem('bbps_yearly_scores')) || {};
+        if (!yearlyScores[selectedClass]) yearlyScores[selectedClass] = 0;
+        yearlyScores[selectedClass] += total;
+        localStorage.setItem('bbps_yearly_scores', JSON.stringify(yearlyScores));
+
+        dailyLog[selectedClass] = { date: todayKey, pointsAdded: total };
+        localStorage.setItem('bbps_daily_log', JSON.stringify(dailyLog));
+        localStorage.setItem('bbps_daily_high', selectedClass);
+
+        ['score-water', 'score-paper', 'score-arrange', 'score-cupboard'].forEach(id => document.getElementById(id).value = 0);
+        updateDisplays();
+
+        updateChart(currentScores);
+        updateBadges();
+        checkDailyStatus();
+        
+        confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
+    }
+
+    // --- UNDO TODAY ---
+    function undoToday() {
+        const selectedClass = document.getElementById('class-selector').value;
+        const dailyLog = JSON.parse(localStorage.getItem('bbps_daily_log')) || {};
+        const todayKey = getSimpleDateKey();
+
+        if (!dailyLog[selectedClass] || dailyLog[selectedClass].date !== todayKey) return;
+
+        if(!confirm(`Undo today's entry for ${selectedClass}?`)) return;
+
+        const pointsToRemove = dailyLog[selectedClass].pointsAdded;
+
+        let currentScores = JSON.parse(localStorage.getItem('bbps_weekly_scores')) || {};
+        if (currentScores[selectedClass]) {
+            currentScores[selectedClass] = Math.max(0, currentScores[selectedClass] - pointsToRemove);
+        }
+        localStorage.setItem('bbps_weekly_scores', JSON.stringify(currentScores));
+
+        let yearlyScores = JSON.parse(localStorage.getItem('bbps_yearly_scores')) || {};
+        if (yearlyScores[selectedClass]) {
+            yearlyScores[selectedClass] = Math.max(0, yearlyScores[selectedClass] - pointsToRemove);
+        }
+        localStorage.setItem('bbps_yearly_scores', JSON.stringify(yearlyScores));
+
+        delete dailyLog[selectedClass];
+        localStorage.setItem('bbps_daily_log', JSON.stringify(dailyLog));
+
+        updateChart(currentScores);
+        updateBadges();
+        checkDailyStatus();
+    }
+
+    // --- HARD RESET CLASS ---
+    function hardResetClass() {
+        const selectedClass = document.getElementById('class-selector').value;
+        
+        if (!confirm(`⚠️ WARNING: Are you sure you want to delete ALL points (Weekly & Yearly) for ${selectedClass}?\n\nThis cannot be undone.`)) return;
+
+        // Reset Weekly
+        let weeklyScores = JSON.parse(localStorage.getItem('bbps_weekly_scores')) || {};
+        weeklyScores[selectedClass] = 0;
+        localStorage.setItem('bbps_weekly_scores', JSON.stringify(weeklyScores));
+
+        // Reset Yearly
+        let yearlyScores = JSON.parse(localStorage.getItem('bbps_yearly_scores')) || {};
+        yearlyScores[selectedClass] = 0;
+        localStorage.setItem('bbps_yearly_scores', JSON.stringify(yearlyScores));
+
+        // Reset Daily Log for this class to unlock today
+        let dailyLog = JSON.parse(localStorage.getItem('bbps_daily_log')) || {};
+        if (dailyLog[selectedClass]) delete dailyLog[selectedClass];
+        localStorage.setItem('bbps_daily_log', JSON.stringify(dailyLog));
+
+        updateChart(weeklyScores);
+        updateBadges();
+        checkDailyStatus();
+        alert(`${selectedClass} scores have been reset to 0.`);
+    }
+
+    function updateChart(scoresObj) {
+        if (!scoresObj) return;
+        const dataArr = classes.map(c => scoresObj[c] || 0);
+        chart.data.datasets[0].data = dataArr;
+        chart.update();
+    }
+
+    function getWinner(scoresObj) {
+        if (!scoresObj) return "-";
+        let max = -1;
+        let winner = "-";
+        for (const [cls, score] of Object.entries(scoresObj)) {
+            if (score > max && score > 0) {
+                max = score;
+                winner = cls;
+            }
+        }
+        return winner;
+    }
+
+    function updateBadges() {
+        let weeklyScores = JSON.parse(localStorage.getItem('bbps_weekly_scores'));
+        let yearlyScores = JSON.parse(localStorage.getItem('bbps_yearly_scores'));
+        let dailyWinner = localStorage.getItem('bbps_daily_high') || "-";
+
+        document.getElementById('badge-daily').innerText = dailyWinner;
+        document.getElementById('badge-weekly').innerText = getWinner(weeklyScores);
+        document.getElementById('badge-yearly').innerText = getWinner(yearlyScores);
+    }
+
+    function endWeek() {
+        if(!confirm("⚠️ End the Week?\n\nThis will:\n1. Save the current winner to History.\n2. RESET Weekly scores to 0.\n3. Keep Yearly scores.")) return;
+
+        let weeklyScores = JSON.parse(localStorage.getItem('bbps_weekly_scores')) || {};
+        let yearlyScores = JSON.parse(localStorage.getItem('bbps_yearly_scores')) || {};
+
+        let weekWinner = getWinner(weeklyScores);
+        let yearLeader = getWinner(yearlyScores);
+        let date = getTodayDateString();
+
+        let historyEntry = { date: date, weekly: weekWinner, yearly: yearLeader };
+
+        let history = JSON.parse(localStorage.getItem('bbps_history')) || [];
+        history.unshift(historyEntry);
+        localStorage.setItem('bbps_history', JSON.stringify(history));
+
+        localStorage.removeItem('bbps_weekly_scores');
+        localStorage.removeItem('bbps_daily_log'); 
+        localStorage.removeItem('bbps_daily_high');
+
+        loadData();
+        chart.data.datasets[0].data = new Array(9).fill(0);
+        chart.update();
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    }
+
+    function renderHistoryTable(historyArray) {
+        const tbody = document.getElementById('history-body');
+        const noHistoryMsg = document.getElementById('no-history');
+        tbody.innerHTML = "";
+
+        if (historyArray && historyArray.length > 0) {
+            noHistoryMsg.style.display = 'none';
+            historyArray.forEach(entry => {
+                let row = `<tr>
+                    <td>${entry.date}</td>
+                    <td><span style="font-weight:bold; color:var(--primary)">${entry.weekly}</span></td>
+                    <td>${entry.yearly}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        } else {
+            noHistoryMsg.style.display = 'block';
+        }
+    }
+
+    loadData();
+
+</script>
+</body>
+</html>
