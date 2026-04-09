@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BBPS Cleanliness Tracker - Class 7 & 8</title>
+    <title>BBPS Cleanliness Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -25,58 +25,64 @@
         header {
             text-align: center; margin-bottom: 25px; background: linear-gradient(135deg, var(--primary), var(--secondary));
             padding: 20px; border-radius: 20px; color: white; box-shadow: 0 10px 25px rgba(74, 222, 128, 0.4);
-            position: relative; overflow: hidden;
         }
+        h1 { margin: 0; font-weight: 800; letter-spacing: 1px; }
 
+        /* Grade Toggle */
+        .grade-toggle-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .grade-btn { padding: 12px 35px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; font-size: 1.2rem; transition: all 0.3s; background: #cbd5e1; color: #475569; }
+        .grade-btn.active { background: var(--dark); color: white; transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        /* Marquee - SLOWED DOWN (350s for the full loop = ~7s per quote) */
         .marquee-container { width: 100%; overflow: hidden; background: rgba(0,0,0,0.2); padding: 12px 0; margin-top: 15px; border-radius: 10px; display: flex; align-items: center; }
-        .marquee-content { display: flex; white-space: nowrap; animation: scroll-left 40s linear infinite; }
-        .quote-item { display: flex; align-items: center; font-style: italic; font-size: 1rem; margin-right: 80px; font-weight: 600; }
+        .marquee-content { display: flex; white-space: nowrap; animation: scroll-left 350s linear infinite; }
+        .quote-item { display: flex; align-items: center; font-style: italic; font-size: 0.95rem; margin-right: 50px; font-weight: 600; }
         .quote-author { font-weight: 800; color: var(--gold); margin-left: 8px; }
-        .anim-avatar { font-size: 1.8rem; margin-right: 12px; animation: bounce 2s infinite ease-in-out; display: inline-block; }
+        .anim-avatar { font-size: 1.5rem; margin-right: 12px; animation: bounce 2s infinite ease-in-out; display: inline-block; }
 
         @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
-        .grade-toggle-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .grade-btn { padding: 10px 30px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; font-size: 1.2rem; transition: 0.3s; background: #ddd; }
-        .grade-btn.active { background: var(--dark); color: white; transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-
+        /* Layout */
         .container { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
         .card { background: var(--card-bg); padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        h2 { border-bottom: 3px solid var(--primary); display: inline-block; padding-bottom: 5px; margin-top: 0; }
 
         label { display: block; margin: 15px 0 5px; font-weight: 600; }
         select, input[type="range"], input[type="number"] { width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; font-family: inherit; }
         
         .score-display { font-weight: 800; color: var(--accent); font-size: 1.2rem; }
-        button.submit-btn { background: var(--dark); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 20px; }
-        .admin-login-btn { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; }
+        
+        button { font-family: inherit; }
+        button.submit-btn { background: var(--dark); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        button.submit-btn:hover { background: var(--accent); }
+        button.archive-btn { background: #8b5cf6; color: white; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; }
 
+        /* Editor Mode */
+        .admin-login-btn { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 20px; }
+        #editor-panel { display: none; background: #fff1f2; border: 2px solid var(--danger); }
+
+        /* Badges */
         .badges-container { display: flex; gap: 15px; margin-bottom: 20px; }
-        .badge-card { flex: 1; background: white; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #ddd; }
-        .badge-winner { font-size: 1.3rem; font-weight: 800; color: var(--dark); }
-        .badge-date { font-size: 0.75rem; color: #666; display: block; }
+        .badge-card { flex: 1; background: #f8fafc; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #e2e8f0; }
+        .badge-winner { font-size: 1.6rem; font-weight: 800; color: var(--dark); margin: 5px 0; }
+        .badge-date { font-size: 0.85rem; color: #64748b; font-weight: 600; background: #e2e8f0; padding: 3px 8px; border-radius: 5px; display: inline-block;}
 
+        /* Table */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #f8fafc; color: #64748b; font-size: 0.85rem; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>✨ BBPS Cleanliness Tracker ✨</h1>
-    <div id="grade-title" style="font-size: 1.1rem; font-weight: 600;">CLASS 8 MODE</div>
+    <div id="grade-title" style="font-size: 1.2rem; font-weight: 800; margin-top: 10px; color: var(--gold);">CLASS 8 MODE</div>
     
     <div class="marquee-container">
-        <div class="marquee-content">
-            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "Cleanliness is next to Godliness." <span class="quote-author">- Mahatma Gandhi</span></div>
-            <div class="quote-item"><span class="anim-avatar">🏫</span> "BBPS Goal: Every Class must reach 15 Points Daily!" <span class="quote-author">- BBPS Official</span></div>
-            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "Be the change you want to see in the world." <span class="quote-author">- Mahatma Gandhi</span></div>
-            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "I will not let anyone walk through my mind with their dirty feet." <span class="quote-author">- Mahatma Gandhi</span></div>
-            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "A bathroom is a place to keep as clean as the drawing room." <span class="quote-author">- Mahatma Gandhi</span></div>
-            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "It is the duty of every student to keep the school clean." <span class="quote-author">- Mahatma Gandhi</span></div>
-            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "Cleanliness is next to Godliness." <span class="quote-author">- Mahatma Gandhi</span></div>
-            <div class="quote-item"><span class="anim-avatar">🏫</span> "BBPS Goal: Every Class must reach 15 Points Daily!" <span class="quote-author">- BBPS Official</span></div>
-        </div>
+        <div class="marquee-content" id="quote-scroller">
+            </div>
     </div>
 </header>
 
@@ -87,64 +93,122 @@
 
 <div class="container">
     <div class="input-section">
-        <button class="admin-login-btn" onclick="loginEditor()">🛠️ UNLOCK EDITOR MODE</button>
         
-        <div class="card" id="editor-panel" style="display:none; border: 2px solid var(--danger);">
-            <div style="background:var(--danger); color:white; padding:5px; text-align:center; font-weight:bold; border-radius:5px;">EDITOR ACTIVE</div>
+        <button class="admin-login-btn" id="login-btn" onclick="loginEditor()">🛠️ UNLOCK EDITOR MODE</button>
+        
+        <div class="card" id="editor-panel">
+            <div style="background:var(--danger); color:white; padding:10px; text-align:center; font-weight:bold; border-radius:8px; margin-bottom: 10px;">EDITOR ACTIVE</div>
+            
+            <label>Select Section to Edit:</label>
+            <select id="edit-section">
+                <option value="A">A</option> <option value="B">B</option> <option value="C">C</option>
+                <option value="D">D</option> <option value="E">E</option> <option value="F">F</option>
+                <option value="G">G</option> <option value="H">H</option> <option value="I">I</option>
+            </select>
+
             <label>Set Weekly Score:</label>
-            <input type="number" id="edit-score" placeholder="Enter Score">
-            <button onclick="forceSave()" style="margin-top:10px; width:100%; padding:10px; background:var(--dark); color:white; border-radius:8px;">Save Changes</button>
+            <input type="number" id="edit-score" placeholder="New Score">
+            <button class="submit-btn" style="margin-top:10px;" onclick="forceSave()">💾 Save Changes</button>
         </div>
 
         <div class="card">
             <h2>📝 Judge's Panel</h2>
             <label>Select Section</label>
-            <select id="section-selector" onchange="checkDailyStatus()">
-                <option value="A">Section A</option>
-                <option value="B">Section B</option>
-                <option value="C">Section C</option>
-                <option value="D">Section D</option>
-                <option value="E">Section E</option>
-                <option value="F">Section F</option>
-                <option value="G">Section G</option>
-                <option value="H">Section H</option>
-                <option value="I">Section I</option>
+            <select id="section-selector">
+                <option value="A">Section A</option> <option value="B">Section B</option> <option value="C">Section C</option>
+                <option value="D">Section D</option> <option value="E">Section E</option> <option value="F">Section F</option>
+                <option value="G">Section G</option> <option value="H">Section H</option> <option value="I">Section I</option>
             </select>
 
-            <label>🚰 Water (0-5)</label>
-            <input type="range" id="s-water" min="0" max="5" value="0" oninput="updateDisp()">
-            <label>📄 Paper (0-5)</label>
-            <input type="range" id="s-paper" min="0" max="5" value="0" oninput="updateDisp()">
-            <label>🪑 Arrangement (0-5)</label>
-            <input type="range" id="s-arrange" min="0" max="5" value="0" oninput="updateDisp()">
+            <label>🚰 Water Spilled (0-5)</label>
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+                <input type="range" id="s-water" min="0" max="5" value="0" oninput="updateDisp()">
+                <span id="d-water" class="score-display" style="margin-left:15px;">0</span>
+            </div>
 
-            <div style="text-align:center; margin-top:10px; font-weight:800;">Total: <span id="total-val" class="score-display">0</span> / 15</div>
+            <label>📄 Papers on Ground (0-5)</label>
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+                <input type="range" id="s-paper" min="0" max="5" value="0" oninput="updateDisp()">
+                <span id="d-paper" class="score-display" style="margin-left:15px;">0</span>
+            </div>
+
+            <label>🪑 Table Arrangement (0-5)</label>
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+                <input type="range" id="s-arrange" min="0" max="5" value="0" oninput="updateDisp()">
+                <span id="d-arrange" class="score-display" style="margin-left:15px;">0</span>
+            </div>
+
+            <div style="text-align:center; margin-top:20px; font-size:1.1rem; font-weight:800; background:#f1f5f9; padding:10px; border-radius:10px;">
+                Total Points: <span id="total-val" style="color:var(--primary); font-size:1.5rem;">0</span> / 15
+            </div>
+            
             <button id="award-btn" class="submit-btn" onclick="addPoints()">✅ Award Points</button>
+            <button class="archive-btn" onclick="endWeek()">🏆 End Week & Archive Scores</button>
         </div>
     </div>
 
     <div class="results-section">
         <div class="badges-container">
-            <div class="badge-card">
-                <span style="font-size:1.5rem;">⭐</span>
-                <div style="font-size:0.8rem;">TODAY'S WINNER</div>
+            <div class="badge-card" style="border-top: 4px solid var(--accent);">
+                <span style="font-size:2rem;">⭐</span>
+                <div style="font-size:0.85rem; font-weight:bold; color:#666;">TODAY'S WINNER</div>
                 <div class="badge-winner" id="badge-daily">-</div>
-                <span class="badge-date" id="badge-daily-date"></span>
+                <span class="badge-date" id="badge-daily-date">No date yet</span>
             </div>
-            <div class="badge-card" style="border-color:var(--gold);">
-                <span style="font-size:1.5rem;">👑</span>
-                <div style="font-size:0.8rem;">WEEKLY CHAMP</div>
-                <div class="badge-winner" id="badge-weekly">-</div>
+            <div class="badge-card" style="border-top: 4px solid var(--gold);">
+                <span style="font-size:2rem;">👑</span>
+                <div style="font-size:0.85rem; font-weight:bold; color:#666;">CURRENT LEADER</div>
+                <div class="badge-winner" id="badge-leader">-</div>
+                <span class="badge-date">Overall Highest Score</span>
             </div>
         </div>
 
         <div class="card">
+            <h2>📊 Weekly Leaderboard</h2>
             <canvas id="cleanChart"></canvas>
+        </div>
+
+        <div class="card">
+            <h2>📜 Save Data (Archive)</h2>
+            <div style="max-height: 200px; overflow-y: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date Archived</th>
+                            <th>Class Winner</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body"></tbody>
+                </table>
+                <p id="no-history" style="text-align:center; color:#999; font-size:0.9rem; padding:10px;">No saved data yet for this class.</p>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+    // --- Quotes Generator ---
+    const quoteData = [
+        { emoji: "👨🏽‍🦲", text: "Cleanliness is next to Godliness.", author: "Mahatma Gandhi" },
+        { emoji: "👨🏽‍🦲", text: "Be the change you want to see in the world.", author: "Mahatma Gandhi" },
+        { emoji: "👨🏽‍🦲", text: "I will not let anyone walk through my mind with their dirty feet.", author: "Mahatma Gandhi" },
+        { emoji: "👨🏽‍🦲", text: "A bathroom is a place to keep as clean as the drawing room.", author: "Mahatma Gandhi" },
+        { emoji: "👨🏽‍🦲", text: "It is the duty of every student to keep the school clean.", author: "Mahatma Gandhi" },
+        { emoji: "🏫", text: "BBPS Goal: Every Class must reach 15 Points Daily!", author: "BBPS Official" }
+    ];
+
+    function generateQuotes() {
+        let html = "";
+        for (let i = 0; i < 17; i++) {
+            quoteData.forEach(q => {
+                html += `<div class="quote-item"><span class="anim-avatar">${q.emoji}</span> "${q.text}" <span class="quote-author">- ${q.author}</span></div>`;
+            });
+        }
+        document.getElementById('quote-scroller').innerHTML = html + html; 
+    }
+    generateQuotes();
+
+    // --- Core Logic ---
     let currentGrade = 8;
     const sections = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
     let chart;
@@ -155,9 +219,14 @@
             type: 'bar',
             data: {
                 labels: sections,
-                datasets: [{ label: 'Points', data: new Array(9).fill(0), backgroundColor: '#4ADE80' }]
+                datasets: [{ 
+                    label: 'Points', 
+                    data: new Array(9).fill(0), 
+                    backgroundColor: ['#4ADE80', '#38BDF8', '#F472B6', '#A78BFA', '#FBBF24', '#4ADE80', '#38BDF8', '#F472B6', '#A78BFA'],
+                    borderRadius: 5
+                }]
             },
-            options: { scales: { y: { beginAtZero: true, max: 100 } } }
+            options: { scales: { y: { beginAtZero: true } }, plugins: { legend: {display: false} } }
         });
     }
 
@@ -170,57 +239,131 @@
     }
 
     function updateDisp() {
-        const t = parseInt(document.getElementById('s-water').value) + 
-                  parseInt(document.getElementById('s-paper').value) + 
-                  parseInt(document.getElementById('s-arrange').value);
-        document.getElementById('total-val').innerText = t;
+        const w = parseInt(document.getElementById('s-water').value);
+        const p = parseInt(document.getElementById('s-paper').value);
+        const a = parseInt(document.getElementById('s-arrange').value);
+        
+        document.getElementById('d-water').innerText = w;
+        document.getElementById('d-paper').innerText = p;
+        document.getElementById('d-arrange').innerText = a;
+        document.getElementById('total-val').innerText = w + p + a;
+    }
+
+    function getFormattedDate() {
+        return new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     }
 
     function addPoints() {
         const sec = document.getElementById('section-selector').value;
         const pts = parseInt(document.getElementById('total-val').innerText);
-        const date = new Date().toLocaleDateString();
+        const todayDate = getFormattedDate();
 
+        // Save Scores
         let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
         scores[sec] = (scores[sec] || 0) + pts;
         localStorage.setItem(`bbps_scores_${currentGrade}`, JSON.stringify(scores));
 
-        // Save Today's Winner
+        // Save Today's Winner & Date
         localStorage.setItem(`bbps_win_${currentGrade}`, `${currentGrade}${sec}`);
-        localStorage.setItem(`bbps_win_date_${currentGrade}`, date);
+        localStorage.setItem(`bbps_win_date_${currentGrade}`, todayDate);
+
+        // Reset sliders
+        document.getElementById('s-water').value = 0;
+        document.getElementById('s-paper').value = 0;
+        document.getElementById('s-arrange').value = 0;
+        updateDisp();
 
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
         loadData();
     }
 
+    function endWeek() {
+        if(!confirm(`⚠️ Archive scores for Class ${currentGrade}?\nThis saves the current winner to History and RESETS the live leaderboard to 0.`)) return;
+        
+        const leader = document.getElementById('badge-leader').innerText;
+        const todayDate = getFormattedDate();
+
+        // Save to History
+        if (leader !== "-") {
+            let history = JSON.parse(localStorage.getItem(`bbps_history_${currentGrade}`)) || [];
+            history.unshift({ date: todayDate, winner: leader });
+            localStorage.setItem(`bbps_history_${currentGrade}`, JSON.stringify(history));
+        }
+
+        // Reset Live Data
+        localStorage.removeItem(`bbps_scores_${currentGrade}`);
+        
+        loadData();
+        confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+    }
+
     function loadData() {
+        // Load Chart
         let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
         chart.data.datasets[0].data = sections.map(s => scores[s] || 0);
         chart.update();
 
-        const winner = localStorage.getItem(`bbps_win_${currentGrade}`) || "-";
-        const winDate = localStorage.getItem(`bbps_win_date_${currentGrade}`) || "";
+        // Calculate Overall Leader
+        let highestScore = -1;
+        let leader = "-";
+        for (const [sec, score] of Object.entries(scores)) {
+            if (score > highestScore && score > 0) {
+                highestScore = score;
+                leader = `${currentGrade}${sec}`;
+            }
+        }
+
+        // Load Badges
+        const dailyWinner = localStorage.getItem(`bbps_win_${currentGrade}`) || "-";
+        const dailyDate = localStorage.getItem(`bbps_win_date_${currentGrade}`) || "No date yet";
         
-        document.getElementById('badge-daily').innerText = winner;
-        document.getElementById('badge-daily-date').innerText = winDate;
+        document.getElementById('badge-daily').innerText = dailyWinner;
+        document.getElementById('badge-daily-date').innerText = dailyDate;
+        document.getElementById('badge-leader').innerText = leader;
+
+        // Load History Archive
+        const tbody = document.getElementById('history-body');
+        const noHistory = document.getElementById('no-history');
+        let history = JSON.parse(localStorage.getItem(`bbps_history_${currentGrade}`)) || [];
+        
+        tbody.innerHTML = "";
+        if(history.length > 0) {
+            noHistory.style.display = 'none';
+            history.forEach(entry => {
+                tbody.innerHTML += `<tr><td>${entry.date}</td><td><strong>🏆 ${entry.winner}</strong></td></tr>`;
+            });
+        } else {
+            noHistory.style.display = 'block';
+        }
     }
 
+    // --- Editor Mode ---
     function loginEditor() {
-        if (prompt("Email:") === "217115@pp.balbharati.org") {
+        let email = prompt("Enter Authorized Admin Email:");
+        if (email === "217115@pp.balbharati.org") {
             document.getElementById('editor-panel').style.display = "block";
+            document.getElementById('login-btn').style.display = "none";
+        } else if (email !== null) {
+            alert("❌ Access Denied!");
         }
     }
 
     function forceSave() {
-        const sec = document.getElementById('section-selector').value;
+        const sec = document.getElementById('edit-section').value;
         const val = parseInt(document.getElementById('edit-score').value);
+        
+        if(isNaN(val)) { alert("Enter a valid number!"); return; }
+
         let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
         scores[sec] = val;
         localStorage.setItem(`bbps_scores_${currentGrade}`, JSON.stringify(scores));
+        
+        document.getElementById('edit-score').value = "";
+        alert(`✅ Class ${currentGrade}${sec} updated to ${val} points!`);
         loadData();
-        alert("Saved!");
     }
 
+    // Init App
     initChart();
     loadData();
 </script>
