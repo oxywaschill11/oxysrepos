@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BBPS Cleanliness Tracker - Class 8</title>
+    <title>BBPS Cleanliness Tracker - Class 7 & 8</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -20,647 +20,209 @@
             --gold: #FFD700;
         }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--light);
-            color: var(--dark);
-            margin: 0;
-            padding: 20px;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--light); color: var(--dark); margin: 0; padding: 20px; }
 
-        /* --- Header & Quotes --- */
         header {
-            text-align: center;
-            margin-bottom: 25px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            padding: 20px;
-            border-radius: 20px;
-            color: white;
-            box-shadow: 0 10px 25px rgba(74, 222, 128, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-        h1 { margin: 0; font-weight: 800; letter-spacing: 1px; }
-        
-        .date-display {
-            background: rgba(255,255,255,0.25);
-            padding: 5px 15px;
-            border-radius: 10px;
-            font-weight: 600;
-            margin-top: 10px;
-            display: inline-block;
-            font-size: 1.1rem;
+            text-align: center; margin-bottom: 25px; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 20px; border-radius: 20px; color: white; box-shadow: 0 10px 25px rgba(74, 222, 128, 0.4);
+            position: relative; overflow: hidden;
         }
 
-        /* Moving Quotes Marquee */
-        .marquee-container {
-            width: 100%;
-            overflow: hidden;
-            background: rgba(0,0,0,0.2);
-            padding: 12px 0;
-            margin-top: 15px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-        }
-        .marquee-content {
-            display: flex;
-            white-space: nowrap;
-            /* Animation speed (increase seconds to slow down) */
-            animation: scroll-left 180s linear infinite; 
-        }
-        .quote-item {
-            display: flex;
-            align-items: center;
-            font-style: italic;
-            font-size: 0.95rem;
-            margin-right: 50px;
-            font-weight: 600;
-        }
-        .quote-author {
-            font-weight: 800;
-            color: var(--gold);
-            margin-left: 8px;
-        }
-        .anim-avatar {
-            font-size: 1.8rem;
-            margin-right: 12px;
-            animation: bounce 2s infinite ease-in-out;
-            display: inline-block;
-        }
-        
-        @keyframes scroll-left {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); } /* Scrolls half the duplicated width */
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
+        .marquee-container { width: 100%; overflow: hidden; background: rgba(0,0,0,0.2); padding: 12px 0; margin-top: 15px; border-radius: 10px; display: flex; align-items: center; }
+        .marquee-content { display: flex; white-space: nowrap; animation: scroll-left 40s linear infinite; }
+        .quote-item { display: flex; align-items: center; font-style: italic; font-size: 1rem; margin-right: 80px; font-weight: 600; }
+        .quote-author { font-weight: 800; color: var(--gold); margin-left: 8px; }
+        .anim-avatar { font-size: 1.8rem; margin-right: 12px; animation: bounce 2s infinite ease-in-out; display: inline-block; }
 
-        /* --- Layout --- */
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
-        .card {
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
+        .grade-toggle-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .grade-btn { padding: 10px 30px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; font-size: 1.2rem; transition: 0.3s; background: #ddd; }
+        .grade-btn.active { background: var(--dark); color: white; transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
-        h2 { border-bottom: 3px solid var(--primary); display: inline-block; padding-bottom: 5px; margin-top: 0; }
+        .container { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
 
-        /* --- Form Elements --- */
         label { display: block; margin: 15px 0 5px; font-weight: 600; }
-        select, input[type="range"], input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            border-radius: 10px;
-            border: 2px solid #e2e8f0;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
+        select, input[type="range"], input[type="number"] { width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; font-family: inherit; }
         
-        .range-container { display: flex; align-items: center; justify-content: space-between; }
-        .score-display { font-weight: 800; color: var(--accent); font-size: 1.2rem; margin-left: 10px; }
+        .score-display { font-weight: 800; color: var(--accent); font-size: 1.2rem; }
+        button.submit-btn { background: var(--dark); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 20px; }
+        .admin-login-btn { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; }
 
-        .friday-toggle {
-            background: #fff3cd;
-            border: 2px solid #ffecb5;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-
-        /* Buttons */
-        button { font-family: inherit; }
-        button.submit-btn {
-            background: var(--dark); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.3s;
-        }
-        button.submit-btn:hover { background: var(--accent); transform: translateY(-2px); }
-        button.submit-btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
-
-        button.undo-btn {
-            background: transparent; border: 2px dashed var(--danger); color: var(--danger); width: 100%; padding: 10px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; display: none; 
-        }
-        button.undo-btn:hover { background: #fef2f2; }
-
-        .btn-small { padding: 10px; border: none; border-radius: 8px; font-size: 0.85rem; cursor: pointer; color: white; font-weight: 600; width: 100%; margin-bottom: 5px;}
-        .btn-archive { background: #8b5cf6; } 
-        .btn-print { background: #3b82f6; } 
-
-        /* --- BIG Editor / Admin Controls --- */
-        .admin-login-btn {
-            background: var(--danger); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-bottom: 20px; width: 100%; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
-        }
-        .admin-login-btn:hover { background: #dc2626; transform: scale(1.02); }
-        
-        #editor-panel {
-            display: none; /* Hidden until authenticated */
-            background: #fff1f2; border: 2px solid var(--danger);
-        }
-        .editor-header { background: var(--danger); color: white; padding: 10px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 15px; text-transform: uppercase;}
-        
-        .editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end;}
-        .btn-editor { background: var(--danger); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;}
-        .btn-editor:hover { background: #b91c1c; }
-
-        /* --- Badges --- */
         .badges-container { display: flex; gap: 15px; margin-bottom: 20px; }
-        .badge-card {
-            flex: 1; background: linear-gradient(to right, #fdfbfb, #ebedee); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #ddd;
-        }
-        .badge-icon { font-size: 2rem; display: block; margin-bottom: 5px; }
-        .badge-title { font-size: 0.8rem; text-transform: uppercase; color: #666; letter-spacing: 1px; }
-        .badge-winner { font-size: 1.5rem; font-weight: 800; color: var(--dark); }
+        .badge-card { flex: 1; background: white; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #ddd; }
+        .badge-winner { font-size: 1.3rem; font-weight: 800; color: var(--dark); }
+        .badge-date { font-size: 0.75rem; color: #666; display: block; }
 
-        /* --- Table --- */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #f8fafc; color: #64748b; font-size: 0.85rem; text-transform: uppercase; }
-        
-        /* Print */
-        @media print {
-            .no-print, .input-section, .marquee-container, .admin-login-btn { display: none !important; }
-            .container { display: block; }
-            .card { box-shadow: none; border: 1px solid #ddd; }
-        }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>✨ BBPS Cleanliness Tracker ✨</h1>
-    <div style="font-size: 1.1rem; margin-top: 5px;">Class 8 (A - I)</div>
-    <div class="date-display" id="header-date">Loading Date...</div>
+    <div id="grade-title" style="font-size: 1.1rem; font-weight: 600;">CLASS 8 MODE</div>
     
     <div class="marquee-container">
-        <div class="marquee-content" id="quote-scroller">
-            </div>
+        <div class="marquee-content">
+            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "Cleanliness is next to Godliness." <span class="quote-author">- Mahatma Gandhi</span></div>
+            <div class="quote-item"><span class="anim-avatar">🏫</span> "BBPS Goal: Every Class must reach 15 Points Daily!" <span class="quote-author">- BBPS Official</span></div>
+            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "Be the change you want to see in the world." <span class="quote-author">- Mahatma Gandhi</span></div>
+            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "I will not let anyone walk through my mind with their dirty feet." <span class="quote-author">- Mahatma Gandhi</span></div>
+            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "A bathroom is a place to keep as clean as the drawing room." <span class="quote-author">- Mahatma Gandhi</span></div>
+            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "It is the duty of every student to keep the school clean." <span class="quote-author">- Mahatma Gandhi</span></div>
+            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "Cleanliness is next to Godliness." <span class="quote-author">- Mahatma Gandhi</span></div>
+            <div class="quote-item"><span class="anim-avatar">🏫</span> "BBPS Goal: Every Class must reach 15 Points Daily!" <span class="quote-author">- BBPS Official</span></div>
+        </div>
     </div>
 </header>
 
+<div class="grade-toggle-container">
+    <button class="grade-btn active" id="btn-8" onclick="switchGrade(8)">CLASS 8</button>
+    <button class="grade-btn" id="btn-7" onclick="switchGrade(7)">CLASS 7</button>
+</div>
+
 <div class="container">
-    
     <div class="input-section">
+        <button class="admin-login-btn" onclick="loginEditor()">🛠️ UNLOCK EDITOR MODE</button>
         
-        <button class="admin-login-btn" id="login-btn" onclick="loginEditor()">🛠️ CLICK HERE TO UNLOCK EDITOR MODE</button>
-
-        <div class="card" id="editor-panel">
-            <div class="editor-header">🛠️ EDITOR MODE ACTIVE</div>
-            
-            <label>Select Class to Edit:</label>
-            <select id="edit-class-selector">
-                <option value="8A">8A</option> <option value="8B">8B</option> <option value="8C">8C</option>
-                <option value="8D">8D</option> <option value="8E">8E</option> <option value="8F">8F</option>
-                <option value="8G">8G</option> <option value="8H">8H</option> <option value="8I">8I</option>
-            </select>
-
-            <div class="editor-grid" style="margin-top:10px;">
-                <div>
-                    <label style="font-size:0.8rem;">Set Weekly Score:</label>
-                    <input type="number" id="edit-weekly-score" placeholder="New Score">
-                </div>
-                <button class="btn-editor" onclick="forceSaveScore('weekly')">Save Weekly</button>
-            </div>
-
-            <div class="editor-grid" style="margin-top:10px; border-bottom: 2px dashed #ccc; padding-bottom:15px; margin-bottom: 15px;">
-                <div>
-                    <label style="font-size:0.8rem;">Set Yearly Score:</label>
-                    <input type="number" id="edit-yearly-score" placeholder="New Score">
-                </div>
-                <button class="btn-editor" onclick="forceSaveScore('yearly')">Save Yearly</button>
-            </div>
-
-            <label>Manually Award Badges:</label>
-            <button class="btn-editor" style="width:100%; margin-bottom:5px; background:var(--gold); color:var(--dark);" onclick="forceAwardBadge('weekly')">👑 Crown as Weekly Champ</button>
-            <button class="btn-editor" style="width:100%; background:var(--secondary); color:white;" onclick="forceAwardBadge('yearly')">🌍 Crown as Yearly Leader</button>
+        <div class="card" id="editor-panel" style="display:none; border: 2px solid var(--danger);">
+            <div style="background:var(--danger); color:white; padding:5px; text-align:center; font-weight:bold; border-radius:5px;">EDITOR ACTIVE</div>
+            <label>Set Weekly Score:</label>
+            <input type="number" id="edit-score" placeholder="Enter Score">
+            <button onclick="forceSave()" style="margin-top:10px; width:100%; padding:10px; background:var(--dark); color:white; border-radius:8px;">Save Changes</button>
         </div>
 
         <div class="card">
             <h2>📝 Judge's Panel</h2>
-            
-            <label>Select Class</label>
-            <select id="class-selector" onchange="checkDailyStatus();">
-                <option value="8A">8A</option> <option value="8B">8B</option> <option value="8C">8C</option>
-                <option value="8D">8D</option> <option value="8E">8E</option> <option value="8F">8F</option>
-                <option value="8G">8G</option> <option value="8H">8H</option> <option value="8I">8I</option>
+            <label>Select Section</label>
+            <select id="section-selector" onchange="checkDailyStatus()">
+                <option value="A">Section A</option>
+                <option value="B">Section B</option>
+                <option value="C">Section C</option>
+                <option value="D">Section D</option>
+                <option value="E">Section E</option>
+                <option value="F">Section F</option>
+                <option value="G">Section G</option>
+                <option value="H">Section H</option>
+                <option value="I">Section I</option>
             </select>
 
-            <label class="friday-toggle">
-                <input type="checkbox" id="friday-mode" onchange="toggleFridayMode()">
-                <span>📅 Is it Friday? (Enable Cupboard Check)</span>
-            </label>
+            <label>🚰 Water (0-5)</label>
+            <input type="range" id="s-water" min="0" max="5" value="0" oninput="updateDisp()">
+            <label>📄 Paper (0-5)</label>
+            <input type="range" id="s-paper" min="0" max="5" value="0" oninput="updateDisp()">
+            <label>🪑 Arrangement (0-5)</label>
+            <input type="range" id="s-arrange" min="0" max="5" value="0" oninput="updateDisp()">
 
-            <div id="status-msg" style="text-align:center; color: var(--danger); font-weight:bold; font-size:0.9rem; margin:10px 0; display:none;">
-                ⚠️ Points already added for today!
-            </div>
-
-            <div id="input-fields-wrapper">
-                <label>🚰 Water Spilled / Cleanliness</label>
-                <div class="range-container">
-                    <input type="range" id="score-water" min="0" max="5" step="1" value="0" oninput="updateDisplays()">
-                    <span class="score-display" id="disp-water">0</span>
-                </div>
-
-                <label>📄 Papers on Ground</label>
-                <div class="range-container">
-                    <input type="range" id="score-paper" min="0" max="5" step="1" value="0" oninput="updateDisplays()">
-                    <span class="score-display" id="disp-paper">0</span>
-                </div>
-
-                <label>🪑 Table & Chair Arrangement</label>
-                <div class="range-container">
-                    <input type="range" id="score-arrange" min="0" max="5" step="1" value="0" oninput="updateDisplays()">
-                    <span class="score-display" id="disp-arrange">0</span>
-                </div>
-
-                <div id="friday-criteria" style="display:none; margin-top: 15px; border-top: 2px dashed #ddd; padding-top:10px;">
-                    <label>🚪 Cupboard Cleanliness (Weekly)</label>
-                    <div class="range-container">
-                        <input type="range" id="score-cupboard" min="0" max="5" step="1" value="0" oninput="updateDisplays()">
-                        <span class="score-display" id="disp-cupboard">0</span>
-                    </div>
-                </div>
-            </div>
-
+            <div style="text-align:center; margin-top:10px; font-weight:800;">Total: <span id="total-val" class="score-display">0</span> / 15</div>
             <button id="award-btn" class="submit-btn" onclick="addPoints()">✅ Award Points</button>
-            <button id="undo-btn" class="undo-btn" onclick="undoToday()">↩️ Undo Today's Entry for <span id="undo-class-name"></span></button>
-
-            <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
-                <button class="btn-small btn-archive" onclick="endWeek()">🏆 End Week (Crown Winners & Archive)</button>
-                <button class="btn-small btn-print" onclick="window.print()">🖨️ Print Report</button>
-            </div>
         </div>
-
     </div>
 
     <div class="results-section">
-        
         <div class="badges-container">
             <div class="badge-card">
-                <span class="badge-icon">⭐</span>
-                <div class="badge-title">Latest Star</div>
+                <span style="font-size:1.5rem;">⭐</span>
+                <div style="font-size:0.8rem;">TODAY'S WINNER</div>
                 <div class="badge-winner" id="badge-daily">-</div>
+                <span class="badge-date" id="badge-daily-date"></span>
             </div>
-            <div class="badge-card" style="border-color: var(--gold); background: #fffbe6;">
-                <span class="badge-icon">👑</span>
-                <div class="badge-title">Crowned Weekly Champ</div>
+            <div class="badge-card" style="border-color:var(--gold);">
+                <span style="font-size:1.5rem;">👑</span>
+                <div style="font-size:0.8rem;">WEEKLY CHAMP</div>
                 <div class="badge-winner" id="badge-weekly">-</div>
             </div>
-            <div class="badge-card" style="border-color: var(--secondary); background: #f0f9ff;">
-                <span class="badge-icon">🌍</span>
-                <div class="badge-title">Crowned Yearly Leader</div>
-                <div class="badge-winner" id="badge-yearly">-</div>
-            </div>
         </div>
 
         <div class="card">
-            <h2>📊 Live Leaderboard (Current Week)</h2>
             <canvas id="cleanChart"></canvas>
-        </div>
-
-        <div class="card">
-            <h2>📜 Archive (History Log)</h2>
-            <div style="max-height: 250px; overflow-y: auto;">
-                <table id="history-table">
-                    <thead>
-                        <tr>
-                            <th>Date Archived</th>
-                            <th>Weekly Winner</th>
-                            <th>Yearly Leader</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-body"></tbody>
-                </table>
-                <p id="no-history" style="text-align:center; color:#999; font-size:0.9rem; padding:10px;">No history data yet.</p>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- 100 QUOTES GENERATOR ---
-    const quoteDatabase = [
-        { emoji: "👨🏽‍🦲", text: "Cleanliness is next to Godliness.", author: "Mahatma Gandhi" },
-        { emoji: "👩🏻‍🔬", text: "Cleanliness may be defined to be the emblem of purity of mind.", author: "Joseph Addison" },
-        { emoji: "🌍", text: "Green city, clean city, my dream city.", author: "Global Proverb" },
-        { emoji: "🧹", text: "Don't call it a dream, call it a plan. Clean up!", author: "BBPS Spirit" },
-        { emoji: "✨", text: "External cleanliness creates internal peace.", author: "Anonymous" },
-        { emoji: "🌱", text: "Respect the ground you walk on. Keep it clean.", author: "Earth First" },
-        { emoji: "👩🏻‍💼", text: "The objective of cleaning is not just to clean, but to feel happiness living within that environment.", author: "Marie Kondo" },
-        { emoji: "🏥", text: "Let it be your first care not to be in a dirty place.", author: "Florence Nightingale" },
-        { emoji: "🧼", text: "A clean room equals a clear mind.", author: "Modern Zen" },
-        { emoji: "📚", text: "Education begins with a clean environment.", author: "School Motto" },
-        { emoji: "🕊️", text: "Peace of mind starts with a swept floor.", author: "Old Adage" },
-        { emoji: "🗑️", text: "If you make a mess, clean it up.", author: "Golden Rule" },
-        { emoji: "🌟", text: "Your environment reflects your standards.", author: "Leadership Quote" },
-        { emoji: "💧", text: "Clean water, clean air, clean class.", author: "Eco Warrior" },
-        { emoji: "🤝", text: "Cleanliness is a shared responsibility.", author: "Community Spirit" },
-        { emoji: "🧠", text: "Clutter in your physical surroundings will clutter your mind and spirit.", author: "Psychology Today" },
-        { emoji: "💪", text: "It takes effort to clean, but it takes strength to maintain it.", author: "Unknown" },
-        { emoji: "🏆", text: "Winners keep their space spotless.", author: "Champion's Mindset" },
-        { emoji: "🏫", text: "A beautiful school is a clean school.", author: "BBPS Vision" },
-        { emoji: "🌿", text: "Nature loves cleanliness.", author: "Environmentalist" },
-        { emoji: "⏱️", text: "Take 5 minutes today to clean up for tomorrow.", author: "Productivity Hack" },
-        { emoji: "💡", text: "Bright ideas come from clean desks.", author: "Innovator" },
-        { emoji: "🎨", text: "Consider your classroom a blank canvas. Keep it pristine.", author: "Artist" },
-        { emoji: "🛡️", text: "Cleanliness is our first line of defense.", author: "Health Inspector" },
-        { emoji: "🙌", text: "Teamwork makes the clean work.", author: "Class 8 Spirit" }
-    ];
+    let currentGrade = 8;
+    const sections = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+    let chart;
 
-    function generate100Quotes() {
-        const scroller = document.getElementById('quote-scroller');
-        let html = "";
-        // Loop 4 times through our 25 quotes to create 100 quotes in the DOM
-        for (let i = 0; i < 4; i++) {
-            quoteDatabase.forEach(q => {
-                html += `<div class="quote-item"><span class="anim-avatar">${q.emoji}</span> "${q.text}" <span class="quote-author">- ${q.author}</span></div>`;
-            });
-        }
-        // Duplicate the entire block once more so the infinite scroll CSS animation doesn't clip
-        scroller.innerHTML = html + html; 
-    }
-
-    // --- Data Initialization ---
-    const classes = ['8A', '8B', '8C', '8D', '8E', '8F', '8G', '8H', '8I'];
-    
-    let ctx = document.getElementById('cleanChart').getContext('2d');
-    let chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: classes,
-            datasets: [{
-                label: 'Weekly Points',
-                data: new Array(9).fill(0),
-                backgroundColor: [
-                    '#4ADE80', '#38BDF8', '#F472B6', '#A78BFA', '#FBBF24',
-                    '#4ADE80', '#38BDF8', '#F472B6', '#A78BFA'
-                ],
-                borderRadius: 8,
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: { y: { beginAtZero: true } },
-            plugins: { legend: { display: false } }
-        }
-    });
-
-    // --- Core Functions ---
-
-    function getTodayDateString() {
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date().toLocaleDateString('en-US', options);
-    }
-    
-    function getSimpleDateKey() {
-        return new Date().toISOString().split('T')[0];
-    }
-
-    function loadData() {
-        document.getElementById('header-date').innerText = getTodayDateString();
-        generate100Quotes(); // Inject the 100 quotes
-
-        let savedWeekly = JSON.parse(localStorage.getItem('bbps_weekly_scores'));
-        let savedHistory = JSON.parse(localStorage.getItem('bbps_history'));
-
-        if (savedWeekly) updateChart(savedWeekly);
-        if (savedHistory) renderHistoryTable(savedHistory);
-        
-        updateBadges();
-        checkDailyStatus();
-    }
-
-    function toggleFridayMode() {
-        const isFriday = document.getElementById('friday-mode').checked;
-        document.getElementById('friday-criteria').style.display = isFriday ? 'block' : 'none';
-    }
-
-    function updateDisplays() {
-        ['water', 'paper', 'arrange', 'cupboard'].forEach(id => {
-            document.getElementById(`disp-${id}`).innerText = document.getElementById(`score-${id}`).value;
+    function initChart() {
+        const ctx = document.getElementById('cleanChart').getContext('2d');
+        chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sections,
+                datasets: [{ label: 'Points', data: new Array(9).fill(0), backgroundColor: '#4ADE80' }]
+            },
+            options: { scales: { y: { beginAtZero: true, max: 100 } } }
         });
     }
 
-    // --- LOGIN SYSTEM ---
-    function loginEditor() {
-        let email = prompt("Enter Authorized Email Address:");
-        if (email === "217115@pp.balbharati.org") {
-            document.getElementById('editor-panel').style.display = "block";
-            document.getElementById('login-btn').style.display = "none";
-            alert("✅ Access Granted: Editor Mode Unlocked!");
-        } else {
-            alert("❌ Access Denied: Unauthorized Email.");
-        }
-    }
-
-    // --- EDITOR FUNCTIONS ---
-    function forceSaveScore(type) {
-        const targetClass = document.getElementById('edit-class-selector').value;
-        const inputId = type === 'weekly' ? 'edit-weekly-score' : 'edit-yearly-score';
-        const newScore = parseInt(document.getElementById(inputId).value);
-
-        if (isNaN(newScore)) { alert("Please enter a valid number"); return; }
-
-        let storageKey = type === 'weekly' ? 'bbps_weekly_scores' : 'bbps_yearly_scores';
-        let scores = JSON.parse(localStorage.getItem(storageKey)) || {};
-        scores[targetClass] = newScore;
-        
-        localStorage.setItem(storageKey, JSON.stringify(scores));
-        
-        if(type === 'weekly') updateChart(scores);
-        
-        document.getElementById(inputId).value = "";
-        alert(`✅ ${targetClass} ${type} score manually set to ${newScore}.`);
-    }
-
-    function forceAwardBadge(type) {
-        const targetClass = document.getElementById('edit-class-selector').value;
-        const storageKey = type === 'weekly' ? 'bbps_crowned_weekly' : 'bbps_crowned_yearly';
-        
-        localStorage.setItem(storageKey, targetClass);
-        updateBadges();
-        
-        alert(`👑 ${targetClass} has been manually crowned as the ${type} winner!`);
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-    }
-
-    // --- CHECK STATUS ---
-    function checkDailyStatus() {
-        const selectedClass = document.getElementById('class-selector').value;
-        const dailyLog = JSON.parse(localStorage.getItem('bbps_daily_log')) || {};
-        const todayKey = getSimpleDateKey();
-
-        const awardBtn = document.getElementById('award-btn');
-        const undoBtn = document.getElementById('undo-btn');
-        const statusMsg = document.getElementById('status-msg');
-        const inputsWrapper = document.getElementById('input-fields-wrapper');
-
-        if (dailyLog[selectedClass] && dailyLog[selectedClass].date === todayKey) {
-            awardBtn.disabled = true; awardBtn.innerText = "❌ Done for Today";
-            inputsWrapper.style.opacity = "0.5"; inputsWrapper.style.pointerEvents = "none";
-            statusMsg.style.display = 'block'; undoBtn.style.display = 'block';
-            document.getElementById('undo-class-name').innerText = selectedClass;
-        } else {
-            awardBtn.disabled = false; awardBtn.innerText = "✅ Award Points";
-            inputsWrapper.style.opacity = "1"; inputsWrapper.style.pointerEvents = "auto";
-            statusMsg.style.display = 'none'; undoBtn.style.display = 'none';
-        }
-    }
-
-    // --- ADD POINTS ---
-    function addPoints() {
-        const selectedClass = document.getElementById('class-selector').value;
-        const dailyLog = JSON.parse(localStorage.getItem('bbps_daily_log')) || {};
-        const todayKey = getSimpleDateKey();
-        
-        if (dailyLog[selectedClass] && dailyLog[selectedClass].date === todayKey) {
-            alert("Points already awarded today! Please Undo first if needed."); return;
-        }
-
-        const water = parseInt(document.getElementById('score-water').value);
-        const paper = parseInt(document.getElementById('score-paper').value);
-        const arrange = parseInt(document.getElementById('score-arrange').value);
-        let total = water + paper + arrange;
-
-        if (document.getElementById('friday-mode').checked) total += parseInt(document.getElementById('score-cupboard').value);
-
-        let currentScores = JSON.parse(localStorage.getItem('bbps_weekly_scores')) || {};
-        if (!currentScores[selectedClass]) currentScores[selectedClass] = 0;
-        currentScores[selectedClass] += total;
-        localStorage.setItem('bbps_weekly_scores', JSON.stringify(currentScores));
-
-        let yearlyScores = JSON.parse(localStorage.getItem('bbps_yearly_scores')) || {};
-        if (!yearlyScores[selectedClass]) yearlyScores[selectedClass] = 0;
-        yearlyScores[selectedClass] += total;
-        localStorage.setItem('bbps_yearly_scores', JSON.stringify(yearlyScores));
-
-        dailyLog[selectedClass] = { date: todayKey, pointsAdded: total };
-        localStorage.setItem('bbps_daily_log', JSON.stringify(dailyLog));
-        
-        localStorage.setItem('bbps_daily_high', selectedClass);
-
-        ['score-water', 'score-paper', 'score-arrange', 'score-cupboard'].forEach(id => document.getElementById(id).value = 0);
-        updateDisplays();
-
-        updateChart(currentScores);
-        updateBadges();
-        checkDailyStatus();
-        
-        confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
-    }
-
-    // --- UNDO TODAY ---
-    function undoToday() {
-        const selectedClass = document.getElementById('class-selector').value;
-        const dailyLog = JSON.parse(localStorage.getItem('bbps_daily_log')) || {};
-        const todayKey = getSimpleDateKey();
-
-        if (!dailyLog[selectedClass] || dailyLog[selectedClass].date !== todayKey) return;
-        if(!confirm(`Undo today's entry for ${selectedClass}?`)) return;
-
-        const pointsToRemove = dailyLog[selectedClass].pointsAdded;
-
-        let currentScores = JSON.parse(localStorage.getItem('bbps_weekly_scores')) || {};
-        if (currentScores[selectedClass]) currentScores[selectedClass] = Math.max(0, currentScores[selectedClass] - pointsToRemove);
-        localStorage.setItem('bbps_weekly_scores', JSON.stringify(currentScores));
-
-        let yearlyScores = JSON.parse(localStorage.getItem('bbps_yearly_scores')) || {};
-        if (yearlyScores[selectedClass]) yearlyScores[selectedClass] = Math.max(0, yearlyScores[selectedClass] - pointsToRemove);
-        localStorage.setItem('bbps_yearly_scores', JSON.stringify(yearlyScores));
-
-        delete dailyLog[selectedClass];
-        localStorage.setItem('bbps_daily_log', JSON.stringify(dailyLog));
-
-        updateChart(currentScores);
-        updateBadges();
-        checkDailyStatus();
-    }
-
-    function updateChart(scoresObj) {
-        if (!scoresObj) return;
-        const dataArr = classes.map(c => scoresObj[c] || 0);
-        chart.data.datasets[0].data = dataArr;
-        chart.update();
-    }
-
-    function getWinner(scoresObj) {
-        if (!scoresObj) return "-";
-        let max = -1; let winner = "-";
-        for (const [cls, score] of Object.entries(scoresObj)) {
-            if (score > max && score > 0) { max = score; winner = cls; }
-        }
-        return winner;
-    }
-
-    function updateBadges() {
-        document.getElementById('badge-daily').innerText = localStorage.getItem('bbps_daily_high') || "-";
-        document.getElementById('badge-weekly').innerText = localStorage.getItem('bbps_crowned_weekly') || "-";
-        document.getElementById('badge-yearly').innerText = localStorage.getItem('bbps_crowned_yearly') || "-";
-    }
-
-    function endWeek() {
-        if(!confirm("⚠️ END THE WEEK?\n\nThis will:\n1. Crown the current top scorers.\n2. Save them to the History Archive.\n3. RESET the Live Weekly Leaderboard to 0.\n\nProceed?")) return;
-
-        let weeklyScores = JSON.parse(localStorage.getItem('bbps_weekly_scores')) || {};
-        let yearlyScores = JSON.parse(localStorage.getItem('bbps_yearly_scores')) || {};
-
-        let weekWinner = getWinner(weeklyScores);
-        let yearLeader = getWinner(yearlyScores);
-        let date = getTodayDateString();
-
-        if(weekWinner !== "-") localStorage.setItem('bbps_crowned_weekly', weekWinner);
-        if(yearLeader !== "-") localStorage.setItem('bbps_crowned_yearly', yearLeader);
-
-        let historyEntry = { date: date, weekly: weekWinner, yearly: yearLeader };
-        let history = JSON.parse(localStorage.getItem('bbps_history')) || [];
-        history.unshift(historyEntry);
-        localStorage.setItem('bbps_history', JSON.stringify(history));
-
-        localStorage.removeItem('bbps_weekly_scores');
-        localStorage.removeItem('bbps_daily_log'); 
-        localStorage.removeItem('bbps_daily_high');
-
+    function switchGrade(grade) {
+        currentGrade = grade;
+        document.getElementById('grade-title').innerText = `CLASS ${grade} MODE`;
+        document.getElementById('btn-7').classList.toggle('active', grade === 7);
+        document.getElementById('btn-8').classList.toggle('active', grade === 8);
         loadData();
-        chart.data.datasets[0].data = new Array(9).fill(0);
-        chart.update();
-        confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
     }
 
-    function renderHistoryTable(historyArray) {
-        const tbody = document.getElementById('history-body');
-        const noHistoryMsg = document.getElementById('no-history');
-        tbody.innerHTML = "";
+    function updateDisp() {
+        const t = parseInt(document.getElementById('s-water').value) + 
+                  parseInt(document.getElementById('s-paper').value) + 
+                  parseInt(document.getElementById('s-arrange').value);
+        document.getElementById('total-val').innerText = t;
+    }
 
-        if (historyArray && historyArray.length > 0) {
-            noHistoryMsg.style.display = 'none';
-            historyArray.forEach(entry => {
-                let row = `<tr>
-                    <td>${entry.date}</td>
-                    <td><span style="font-weight:bold; color:var(--primary)">${entry.weekly}</span></td>
-                    <td>${entry.yearly}</td>
-                </tr>`;
-                tbody.innerHTML += row;
-            });
-        } else {
-            noHistoryMsg.style.display = 'block';
+    function addPoints() {
+        const sec = document.getElementById('section-selector').value;
+        const pts = parseInt(document.getElementById('total-val').innerText);
+        const date = new Date().toLocaleDateString();
+
+        let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
+        scores[sec] = (scores[sec] || 0) + pts;
+        localStorage.setItem(`bbps_scores_${currentGrade}`, JSON.stringify(scores));
+
+        // Save Today's Winner
+        localStorage.setItem(`bbps_win_${currentGrade}`, `${currentGrade}${sec}`);
+        localStorage.setItem(`bbps_win_date_${currentGrade}`, date);
+
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        loadData();
+    }
+
+    function loadData() {
+        let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
+        chart.data.datasets[0].data = sections.map(s => scores[s] || 0);
+        chart.update();
+
+        const winner = localStorage.getItem(`bbps_win_${currentGrade}`) || "-";
+        const winDate = localStorage.getItem(`bbps_win_date_${currentGrade}`) || "";
+        
+        document.getElementById('badge-daily').innerText = winner;
+        document.getElementById('badge-daily-date').innerText = winDate;
+    }
+
+    function loginEditor() {
+        if (prompt("Email:") === "217115@pp.balbharati.org") {
+            document.getElementById('editor-panel').style.display = "block";
         }
     }
 
-    loadData();
+    function forceSave() {
+        const sec = document.getElementById('section-selector').value;
+        const val = parseInt(document.getElementById('edit-score').value);
+        let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
+        scores[sec] = val;
+        localStorage.setItem(`bbps_scores_${currentGrade}`, JSON.stringify(scores));
+        loadData();
+        alert("Saved!");
+    }
 
+    initChart();
+    loadData();
 </script>
 </body>
 </html>
