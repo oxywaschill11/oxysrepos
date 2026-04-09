@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BBPS Cleanliness Tracker - Class 7 & 8</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #4ADE80;
+            --secondary: #38BDF8;
+            --accent: #F472B6;
+            --danger: #ef4444;
+            --dark: #1E293B;
+            --light: #F1F5F9;
+            --card-bg: #ffffff;
+            --gold: #FFD700;
+        }
+
+        body { font-family: 'Poppins', sans-serif; background-color: var(--light); color: var(--dark); margin: 0; padding: 20px; }
+
+        header {
+            text-align: center; margin-bottom: 25px; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 20px; border-radius: 20px; color: white; box-shadow: 0 10px 25px rgba(74, 222, 128, 0.4);
+            position: relative; overflow: hidden;
+        }
+
+        .marquee-container { width: 100%; overflow: hidden; background: rgba(0,0,0,0.2); padding: 12px 0; margin-top: 15px; border-radius: 10px; display: flex; align-items: center; }
+        .marquee-content { display: flex; white-space: nowrap; animation: scroll-left 40s linear infinite; }
+        .quote-item { display: flex; align-items: center; font-style: italic; font-size: 1rem; margin-right: 80px; font-weight: 600; }
+        .quote-author { font-weight: 800; color: var(--gold); margin-left: 8px; }
+        .anim-avatar { font-size: 1.8rem; margin-right: 12px; animation: bounce 2s infinite ease-in-out; display: inline-block; }
+
+        @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+        .grade-toggle-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .grade-btn { padding: 10px 30px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; font-size: 1.2rem; transition: 0.3s; background: #ddd; }
+        .grade-btn.active { background: var(--dark); color: white; transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        .container { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+
+        label { display: block; margin: 15px 0 5px; font-weight: 600; }
+        select, input[type="range"], input[type="number"] { width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; font-family: inherit; }
+        
+        .score-display { font-weight: 800; color: var(--accent); font-size: 1.2rem; }
+        button.submit-btn { background: var(--dark); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 20px; }
+        .admin-login-btn { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; }
+
+        .badges-container { display: flex; gap: 15px; margin-bottom: 20px; }
+        .badge-card { flex: 1; background: white; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #ddd; }
+        .badge-winner { font-size: 1.3rem; font-weight: 800; color: var(--dark); }
+        .badge-date { font-size: 0.75rem; color: #666; display: block; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>✨ BBPS Cleanliness Tracker ✨</h1>
+    <div id="grade-title" style="font-size: 1.1rem; font-weight: 600;">CLASS 8 MODE</div>
+    
+    <div class="marquee-container">
+        <div class="marquee-content">
+            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "Cleanliness is next to Godliness." <span class="quote-author">- Mahatma Gandhi</span></div>
+            <div class="quote-item"><span class="anim-avatar">🏫</span> "BBPS Goal: Every Class must reach 15 Points Daily!" <span class="quote-author">- BBPS Official</span></div>
+            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "Be the change you want to see in the world." <span class="quote-author">- Mahatma Gandhi</span></div>
+            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "I will not let anyone walk through my mind with their dirty feet." <span class="quote-author">- Mahatma Gandhi</span></div>
+            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "A bathroom is a place to keep as clean as the drawing room." <span class="quote-author">- Mahatma Gandhi</span></div>
+            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "It is the duty of every student to keep the school clean." <span class="quote-author">- Mahatma Gandhi</span></div>
+            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "Cleanliness is next to Godliness." <span class="quote-author">- Mahatma Gandhi</span></div>
+            <div class="quote-item"><span class="anim-avatar">🏫</span> "BBPS Goal: Every Class must reach 15 Points Daily!" <span class="quote-author">- BBPS Official</span></div>
+        </div>
+    </div>
+</header>
+
+<div class="grade-toggle-container">
+    <button class="grade-btn active" id="btn-8" onclick="switchGrade(8)">CLASS 8</button>
+    <button class="grade-btn" id="btn-7" onclick="switchGrade(7)">CLASS 7</button>
+</div>
+
+<div class="container">
+    <div class="input-section">
+        <button class="admin-login-btn" onclick="loginEditor()">🛠️ UNLOCK EDITOR MODE</button>
+        
+        <div class="card" id="editor-panel" style="display:none; border: 2px solid var(--danger);">
+            <div style="background:var(--danger); color:white; padding:5px; text-align:center; font-weight:bold; border-radius:5px;">EDITOR ACTIVE</div>
+            <label>Set Weekly Score:</label>
+            <input type="number" id="edit-score" placeholder="Enter Score">
+            <button onclick="forceSave()" style="margin-top:10px; width:100%; padding:10px; background:var(--dark); color:white; border-radius:8px;">Save Changes</button>
+        </div>
+
+        <div class="card">
+            <h2>📝 Judge's Panel</h2>
+            <label>Select Section</label>
+            <select id="section-selector" onchange="checkDailyStatus()">
+                <option value="A">Section A</option>
+                <option value="B">Section B</option>
+                <option value="C">Section C</option>
+                <option value="D">Section D</option>
+                <option value="E">Section E</option>
+                <option value="F">Section F</option>
+                <option value="G">Section G</option>
+                <option value="H">Section H</option>
+                <option value="I">Section I</option>
+            </select>
+
+            <label>🚰 Water (0-5)</label>
+            <input type="range" id="s-water" min="0" max="5" value="0" oninput="updateDisp()">
+            <label>📄 Paper (0-5)</label>
+            <input type="range" id="s-paper" min="0" max="5" value="0" oninput="updateDisp()">
+            <label>🪑 Arrangement (0-5)</label>
+            <input type="range" id="s-arrange" min="0" max="5" value="0" oninput="updateDisp()">
+
+            <div style="text-align:center; margin-top:10px; font-weight:800;">Total: <span id="total-val" class="score-display">0</span> / 15</div>
+            <button id="award-btn" class="submit-btn" onclick="addPoints()">✅ Award Points</button>
+        </div>
+    </div>
+
+    <div class="results-section">
+        <div class="badges-container">
+            <div class="badge-card">
+                <span style="font-size:1.5rem;">⭐</span>
+                <div style="font-size:0.8rem;">TODAY'S WINNER</div>
+                <div class="badge-winner" id="badge-daily">-</div>
+                <span class="badge-date" id="badge-daily-date"></span>
+            </div>
+            <div class="badge-card" style="border-color:var(--gold);">
+                <span style="font-size:1.5rem;">👑</span>
+                <div style="font-size:0.8rem;">WEEKLY CHAMP</div>
+                <div class="badge-winner" id="badge-weekly">-</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <canvas id="cleanChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentGrade = 8;
+    const sections = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+    let chart;
+
+    function initChart() {
+        const ctx = document.getElementById('cleanChart').getContext('2d');
+        chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sections,
+                datasets: [{ label: 'Points', data: new Array(9).fill(0), backgroundColor: '#4ADE80' }]
+            },
+            options: { scales: { y: { beginAtZero: true, max: 100 } } }
+        });
+    }
+
+    function switchGrade(grade) {
+        currentGrade = grade;
+        document.getElementById('grade-title').innerText = `CLASS ${grade} MODE`;
+        document.getElementById('btn-7').classList.toggle('active', grade === 7);
+        document.getElementById('btn-8').classList.toggle('active', grade === 8);
+        loadData();
+    }
+
+    function updateDisp() {
+        const t = parseInt(document.getElementById('s-water').value) + 
+                  parseInt(document.getElementById('s-paper').value) + 
+                  parseInt(document.getElementById('s-arrange').value);
+        document.getElementById('total-val').innerText = t;
+    }
+
+    function addPoints() {
+        const sec = document.getElementById('section-selector').value;
+        const pts = parseInt(document.getElementById('total-val').innerText);
+        const date = new Date().toLocaleDateString();
+
+        let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
+        scores[sec] = (scores[sec] || 0) + pts;
+        localStorage.setItem(`bbps_scores_${currentGrade}`, JSON.stringify(scores));
+
+        // Save Today's Winner
+        localStorage.setItem(`bbps_win_${currentGrade}`, `${currentGrade}${sec}`);
+        localStorage.setItem(`bbps_win_date_${currentGrade}`, date);
+
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        loadData();
+    }
+
+    function loadData() {
+        let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
+        chart.data.datasets[0].data = sections.map(s => scores[s] || 0);
+        chart.update();
+
+        const winner = localStorage.getItem(`bbps_win_${currentGrade}`) || "-";
+        const winDate = localStorage.getItem(`bbps_win_date_${currentGrade}`) || "";
+        
+        document.getElementById('badge-daily').innerText = winner;
+        document.getElementById('badge-daily-date').innerText = winDate;
+    }
+
+    function loginEditor() {
+        if (prompt("Email:") === "217115@pp.balbharati.org") {
+            document.getElementById('editor-panel').style.display = "block";
+        }
+    }
+
+    function forceSave() {
+        const sec = document.getElementById('section-selector').value;
+        const val = parseInt(document.getElementById('edit-score').value);
+        let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
+        scores[sec] = val;
+        localStorage.setItem(`bbps_scores_${currentGrade}`, JSON.stringify(scores));
+        loadData();
+        alert("Saved!");
+    }
+
+    initChart();
+    loadData();
+</script>
+</body>
+</html>
