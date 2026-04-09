@@ -56,8 +56,8 @@
         .marquee-container {
             width: 100%;
             overflow: hidden;
-            background: rgba(0,0,0,0.15);
-            padding: 10px 0;
+            background: rgba(0,0,0,0.2);
+            padding: 12px 0;
             margin-top: 15px;
             border-radius: 10px;
             display: flex;
@@ -66,7 +66,8 @@
         .marquee-content {
             display: flex;
             white-space: nowrap;
-            animation: scroll-left 25s linear infinite;
+            /* Animation speed (increase seconds to slow down) */
+            animation: scroll-left 180s linear infinite; 
         }
         .quote-item {
             display: flex;
@@ -79,18 +80,18 @@
         .quote-author {
             font-weight: 800;
             color: var(--gold);
-            margin-left: 5px;
+            margin-left: 8px;
         }
         .anim-avatar {
-            font-size: 1.5rem;
-            margin-right: 10px;
+            font-size: 1.8rem;
+            margin-right: 12px;
             animation: bounce 2s infinite ease-in-out;
             display: inline-block;
         }
         
         @keyframes scroll-left {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } /* Scrolls half the duplicated width */
         }
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
@@ -159,20 +160,21 @@
         .btn-archive { background: #8b5cf6; } 
         .btn-print { background: #3b82f6; } 
 
-        /* --- Editor / Admin Controls --- */
+        /* --- BIG Editor / Admin Controls --- */
         .admin-login-btn {
-            background: transparent; border: 1px solid var(--dark); color: var(--dark); padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin-top: 15px; width: 100%;
+            background: var(--danger); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-bottom: 20px; width: 100%; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
         }
+        .admin-login-btn:hover { background: #dc2626; transform: scale(1.02); }
         
         #editor-panel {
             display: none; /* Hidden until authenticated */
-            background: #f8fafc; border: 2px solid var(--dark);
+            background: #fff1f2; border: 2px solid var(--danger);
         }
-        .editor-header { background: var(--dark); color: white; padding: 10px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 15px; }
+        .editor-header { background: var(--danger); color: white; padding: 10px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 15px; text-transform: uppercase;}
         
         .editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end;}
-        .btn-editor { background: var(--gold); color: var(--dark); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;}
-        .btn-editor:hover { filter: brightness(0.9); }
+        .btn-editor { background: var(--danger); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;}
+        .btn-editor:hover { background: #b91c1c; }
 
         /* --- Badges --- */
         .badges-container { display: flex; gap: 15px; margin-bottom: 20px; }
@@ -204,35 +206,56 @@
     <div class="date-display" id="header-date">Loading Date...</div>
     
     <div class="marquee-container">
-        <div class="marquee-content">
-            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "Cleanliness is next to Godliness." <span class="quote-author">- Mahatma Gandhi</span></div>
-            <div class="quote-item"><span class="anim-avatar">👩🏻‍🔬</span> "Cleanliness may be defined to be the emblem of purity of mind." <span class="quote-author">- Joseph Addison</span></div>
-            <div class="quote-item"><span class="anim-avatar">🌍</span> "Green city, clean city, my dream city." <span class="quote-author">- Global Proverb</span></div>
-            <div class="quote-item"><span class="anim-avatar">🧹</span> "Don't call it a dream, call it a plan. Clean up!" <span class="quote-author">- BBPS Spirit</span></div>
-            
-            <div class="quote-item"><span class="anim-avatar">👨🏽‍🦲</span> "Cleanliness is next to Godliness." <span class="quote-author">- Mahatma Gandhi</span></div>
-            <div class="quote-item"><span class="anim-avatar">👩🏻‍🔬</span> "Cleanliness may be defined to be the emblem of purity of mind." <span class="quote-author">- Joseph Addison</span></div>
-        </div>
+        <div class="marquee-content" id="quote-scroller">
+            </div>
     </div>
 </header>
 
 <div class="container">
     
     <div class="input-section">
+        
+        <button class="admin-login-btn" id="login-btn" onclick="loginEditor()">🛠️ CLICK HERE TO UNLOCK EDITOR MODE</button>
+
+        <div class="card" id="editor-panel">
+            <div class="editor-header">🛠️ EDITOR MODE ACTIVE</div>
+            
+            <label>Select Class to Edit:</label>
+            <select id="edit-class-selector">
+                <option value="8A">8A</option> <option value="8B">8B</option> <option value="8C">8C</option>
+                <option value="8D">8D</option> <option value="8E">8E</option> <option value="8F">8F</option>
+                <option value="8G">8G</option> <option value="8H">8H</option> <option value="8I">8I</option>
+            </select>
+
+            <div class="editor-grid" style="margin-top:10px;">
+                <div>
+                    <label style="font-size:0.8rem;">Set Weekly Score:</label>
+                    <input type="number" id="edit-weekly-score" placeholder="New Score">
+                </div>
+                <button class="btn-editor" onclick="forceSaveScore('weekly')">Save Weekly</button>
+            </div>
+
+            <div class="editor-grid" style="margin-top:10px; border-bottom: 2px dashed #ccc; padding-bottom:15px; margin-bottom: 15px;">
+                <div>
+                    <label style="font-size:0.8rem;">Set Yearly Score:</label>
+                    <input type="number" id="edit-yearly-score" placeholder="New Score">
+                </div>
+                <button class="btn-editor" onclick="forceSaveScore('yearly')">Save Yearly</button>
+            </div>
+
+            <label>Manually Award Badges:</label>
+            <button class="btn-editor" style="width:100%; margin-bottom:5px; background:var(--gold); color:var(--dark);" onclick="forceAwardBadge('weekly')">👑 Crown as Weekly Champ</button>
+            <button class="btn-editor" style="width:100%; background:var(--secondary); color:white;" onclick="forceAwardBadge('yearly')">🌍 Crown as Yearly Leader</button>
+        </div>
+
         <div class="card">
             <h2>📝 Judge's Panel</h2>
             
             <label>Select Class</label>
             <select id="class-selector" onchange="checkDailyStatus();">
-                <option value="8A">8A</option>
-                <option value="8B">8B</option>
-                <option value="8C">8C</option>
-                <option value="8D">8D</option>
-                <option value="8E">8E</option>
-                <option value="8F">8F</option>
-                <option value="8G">8G</option>
-                <option value="8H">8H</option>
-                <option value="8I">8I</option>
+                <option value="8A">8A</option> <option value="8B">8B</option> <option value="8C">8C</option>
+                <option value="8D">8D</option> <option value="8E">8E</option> <option value="8F">8F</option>
+                <option value="8G">8G</option> <option value="8H">8H</option> <option value="8I">8I</option>
             </select>
 
             <label class="friday-toggle">
@@ -279,39 +302,6 @@
                 <button class="btn-small btn-archive" onclick="endWeek()">🏆 End Week (Crown Winners & Archive)</button>
                 <button class="btn-small btn-print" onclick="window.print()">🖨️ Print Report</button>
             </div>
-
-            <button class="admin-login-btn" id="login-btn" onclick="loginEditor()">🔒 Unlock Editor Mode</button>
-        </div>
-
-        <div class="card" id="editor-panel">
-            <div class="editor-header">🛠️ EDITOR MODE ACTIVE</div>
-            
-            <label>Select Class to Edit:</label>
-            <select id="edit-class-selector">
-                <option value="8A">8A</option> <option value="8B">8B</option> <option value="8C">8C</option>
-                <option value="8D">8D</option> <option value="8E">8E</option> <option value="8F">8F</option>
-                <option value="8G">8G</option> <option value="8H">8H</option> <option value="8I">8I</option>
-            </select>
-
-            <div class="editor-grid" style="margin-top:10px;">
-                <div>
-                    <label style="font-size:0.8rem;">Set Weekly Score:</label>
-                    <input type="number" id="edit-weekly-score" placeholder="New Score">
-                </div>
-                <button class="btn-editor" onclick="forceSaveScore('weekly')">Save Weekly</button>
-            </div>
-
-            <div class="editor-grid" style="margin-top:10px; border-bottom: 2px dashed #ccc; padding-bottom:15px; margin-bottom: 15px;">
-                <div>
-                    <label style="font-size:0.8rem;">Set Yearly Score:</label>
-                    <input type="number" id="edit-yearly-score" placeholder="New Score">
-                </div>
-                <button class="btn-editor" onclick="forceSaveScore('yearly')">Save Yearly</button>
-            </div>
-
-            <label>Manually Award Badges:</label>
-            <button class="btn-editor" style="width:100%; margin-bottom:5px;" onclick="forceAwardBadge('weekly')">👑 Crown as Weekly Champ</button>
-            <button class="btn-editor" style="width:100%; background:#38BDF8; color:white;" onclick="forceAwardBadge('yearly')">🌍 Crown as Yearly Leader</button>
         </div>
 
     </div>
@@ -361,6 +351,48 @@
 </div>
 
 <script>
+    // --- 100 QUOTES GENERATOR ---
+    const quoteDatabase = [
+        { emoji: "👨🏽‍🦲", text: "Cleanliness is next to Godliness.", author: "Mahatma Gandhi" },
+        { emoji: "👩🏻‍🔬", text: "Cleanliness may be defined to be the emblem of purity of mind.", author: "Joseph Addison" },
+        { emoji: "🌍", text: "Green city, clean city, my dream city.", author: "Global Proverb" },
+        { emoji: "🧹", text: "Don't call it a dream, call it a plan. Clean up!", author: "BBPS Spirit" },
+        { emoji: "✨", text: "External cleanliness creates internal peace.", author: "Anonymous" },
+        { emoji: "🌱", text: "Respect the ground you walk on. Keep it clean.", author: "Earth First" },
+        { emoji: "👩🏻‍💼", text: "The objective of cleaning is not just to clean, but to feel happiness living within that environment.", author: "Marie Kondo" },
+        { emoji: "🏥", text: "Let it be your first care not to be in a dirty place.", author: "Florence Nightingale" },
+        { emoji: "🧼", text: "A clean room equals a clear mind.", author: "Modern Zen" },
+        { emoji: "📚", text: "Education begins with a clean environment.", author: "School Motto" },
+        { emoji: "🕊️", text: "Peace of mind starts with a swept floor.", author: "Old Adage" },
+        { emoji: "🗑️", text: "If you make a mess, clean it up.", author: "Golden Rule" },
+        { emoji: "🌟", text: "Your environment reflects your standards.", author: "Leadership Quote" },
+        { emoji: "💧", text: "Clean water, clean air, clean class.", author: "Eco Warrior" },
+        { emoji: "🤝", text: "Cleanliness is a shared responsibility.", author: "Community Spirit" },
+        { emoji: "🧠", text: "Clutter in your physical surroundings will clutter your mind and spirit.", author: "Psychology Today" },
+        { emoji: "💪", text: "It takes effort to clean, but it takes strength to maintain it.", author: "Unknown" },
+        { emoji: "🏆", text: "Winners keep their space spotless.", author: "Champion's Mindset" },
+        { emoji: "🏫", text: "A beautiful school is a clean school.", author: "BBPS Vision" },
+        { emoji: "🌿", text: "Nature loves cleanliness.", author: "Environmentalist" },
+        { emoji: "⏱️", text: "Take 5 minutes today to clean up for tomorrow.", author: "Productivity Hack" },
+        { emoji: "💡", text: "Bright ideas come from clean desks.", author: "Innovator" },
+        { emoji: "🎨", text: "Consider your classroom a blank canvas. Keep it pristine.", author: "Artist" },
+        { emoji: "🛡️", text: "Cleanliness is our first line of defense.", author: "Health Inspector" },
+        { emoji: "🙌", text: "Teamwork makes the clean work.", author: "Class 8 Spirit" }
+    ];
+
+    function generate100Quotes() {
+        const scroller = document.getElementById('quote-scroller');
+        let html = "";
+        // Loop 4 times through our 25 quotes to create 100 quotes in the DOM
+        for (let i = 0; i < 4; i++) {
+            quoteDatabase.forEach(q => {
+                html += `<div class="quote-item"><span class="anim-avatar">${q.emoji}</span> "${q.text}" <span class="quote-author">- ${q.author}</span></div>`;
+            });
+        }
+        // Duplicate the entire block once more so the infinite scroll CSS animation doesn't clip
+        scroller.innerHTML = html + html; 
+    }
+
     // --- Data Initialization ---
     const classes = ['8A', '8B', '8C', '8D', '8E', '8F', '8G', '8H', '8I'];
     
@@ -399,6 +431,7 @@
 
     function loadData() {
         document.getElementById('header-date').innerText = getTodayDateString();
+        generate100Quotes(); // Inject the 100 quotes
 
         let savedWeekly = JSON.parse(localStorage.getItem('bbps_weekly_scores'));
         let savedHistory = JSON.parse(localStorage.getItem('bbps_history'));
@@ -517,7 +550,6 @@
         dailyLog[selectedClass] = { date: todayKey, pointsAdded: total };
         localStorage.setItem('bbps_daily_log', JSON.stringify(dailyLog));
         
-        // Latest Star updates live
         localStorage.setItem('bbps_daily_high', selectedClass);
 
         ['score-water', 'score-paper', 'score-arrange', 'score-cupboard'].forEach(id => document.getElementById(id).value = 0);
@@ -574,10 +606,7 @@
     }
 
     function updateBadges() {
-        // Daily updates live
         document.getElementById('badge-daily').innerText = localStorage.getItem('bbps_daily_high') || "-";
-        
-        // Weekly and Yearly ONLY update from the 'crowned' storage variables now
         document.getElementById('badge-weekly').innerText = localStorage.getItem('bbps_crowned_weekly') || "-";
         document.getElementById('badge-yearly').innerText = localStorage.getItem('bbps_crowned_yearly') || "-";
     }
@@ -592,17 +621,14 @@
         let yearLeader = getWinner(yearlyScores);
         let date = getTodayDateString();
 
-        // 1. Crown the winners (This is what updates the badges now)
         if(weekWinner !== "-") localStorage.setItem('bbps_crowned_weekly', weekWinner);
         if(yearLeader !== "-") localStorage.setItem('bbps_crowned_yearly', yearLeader);
 
-        // 2. Save to History
         let historyEntry = { date: date, weekly: weekWinner, yearly: yearLeader };
         let history = JSON.parse(localStorage.getItem('bbps_history')) || [];
         history.unshift(historyEntry);
         localStorage.setItem('bbps_history', JSON.stringify(history));
 
-        // 3. Reset Live Data
         localStorage.removeItem('bbps_weekly_scores');
         localStorage.removeItem('bbps_daily_log'); 
         localStorage.removeItem('bbps_daily_high');
