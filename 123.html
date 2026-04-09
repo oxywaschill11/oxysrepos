@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BBPS Cleanliness Tracker - Class 7</title>
+    <title>BBPS Cleanliness Tracker - Class 8</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -190,6 +190,7 @@
 
 <header>
     <h1>✨ BBPS Cleanliness Tracker ✨</h1>
+    <div style="font-size: 1.1rem; margin-top: 5px;">Class 8 (A - I)</div>
     <div class="date-display" id="header-date">Loading Date...</div>
     <div class="quote-box" id="daily-quote">"Cleanliness is next to Godliness."</div>
 </header>
@@ -202,15 +203,15 @@
             
             <label>Select Class</label>
             <select id="class-selector" onchange="checkDailyStatus(); updateDangerLabel();">
-                <option value="7A">7A</option>
-                <option value="7B">7B</option>
-                <option value="7C">7C</option>
-                <option value="7D">7D</option>
-                <option value="7E">7E</option>
-                <option value="7F">7F</option>
-                <option value="7G">7G</option>
-                <option value="7H">7H</option>
-                <option value="7I">7I</option>
+                <option value="8A">8A</option>
+                <option value="8B">8B</option>
+                <option value="8C">8C</option>
+                <option value="8D">8D</option>
+                <option value="8E">8E</option>
+                <option value="8F">8F</option>
+                <option value="8G">8G</option>
+                <option value="8H">8H</option>
+                <option value="8I">8I</option>
             </select>
 
             <label class="friday-toggle">
@@ -260,7 +261,7 @@
 
             <div class="class-reset-zone">
                 <button class="btn-danger-outline" onclick="hardResetClass()">
-                    ⚠️ Reset Total Score for <span id="danger-class-label">7A</span>
+                    ⚠️ Reset Total Score for <span id="danger-class-label">8A</span>
                 </button>
             </div>
 
@@ -313,7 +314,7 @@
 
 <script>
     // --- Data Initialization ---
-    const classes = ['7A', '7B', '7C', '7D', '7E', '7F', '7G', '7H', '7I'];
+    const classes = ['8A', '8B', '8C', '8D', '8E', '8F', '8G', '8H', '8I'];
     
     const quotes = [
         "Cleanliness is a state of purity, clarity, and precision.",
