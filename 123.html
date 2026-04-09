@@ -52,8 +52,17 @@
 
         label { display: block; margin: 15px 0 5px; font-weight: 600; }
         select, input[type="range"], input[type="number"] { width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; font-family: inherit; }
-        input[type="range"]:disabled { opacity: 0.4; cursor: not-allowed; }
         
+        /* Toggle Switch CSS */
+        .switch { position: relative; display: inline-block; width: 54px; height: 28px; margin-top: 5px;}
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(26px); }
+        input:disabled + .slider { background-color: #f1f5f9; cursor: not-allowed; border: 1px solid #e2e8f0; }
+        input:disabled + .slider:before { background-color: #cbd5e1; }
+
         .score-display { font-weight: 800; color: var(--accent); font-size: 1.2rem; min-width: 25px; text-align: right; }
         
         button { font-family: inherit; }
@@ -78,7 +87,7 @@
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
         th { background-color: #f8fafc; color: #64748b; font-size: 0.85rem; text-transform: uppercase; }
 
-        /* PRINT STYLES - Hides inputs when you hit print */
+        /* PRINT STYLES */
         @media print {
             .input-section, .grade-toggle-container, .admin-login-btn, .marquee-container, button { display: none !important; }
             .container { display: block; }
@@ -86,7 +95,7 @@
             body { background: white; padding: 0; }
             .card { box-shadow: none; border: 2px solid #000; break-inside: avoid; }
             header { background: white; color: black; box-shadow: none; border: 2px solid #000; }
-            #current-date-display { background: none; color: black; }
+            #current-date-display { background: none; color: black; border: 1px solid #000; }
         }
     </style>
 </head>
@@ -129,6 +138,7 @@
             <hr style="margin: 15px 0; border:1px solid #fecdd3;">
             <button class="admin-action-btn" onclick="resetPeriod('month')">⚠️ Reset Monthly Stats</button>
             <button class="admin-action-btn" style="background: #ef4444;" onclick="resetPeriod('year')">⚠️ Reset Yearly Stats</button>
+            <button class="admin-action-btn" style="background: #10b981; margin-top: 15px;" onclick="forceFriday()">🧪 Test Friday Mode</button>
         </div>
 
         <div class="card">
@@ -158,9 +168,12 @@
                 <span id="d-arrange" class="score-display">0</span>
             </div>
 
-            <label>🚪 Cupboard Organization <span id="friday-notice" style="color:var(--danger); font-size:0.8rem;"></span></label>
-            <div style="display:flex; align-items:center; justify-content:space-between;">
-                <input type="range" id="s-cupboard" min="0" max="5" value="0" oninput="updateDisp()">
+            <label>🚪 Cupboard Organized? (5 pts) <span id="friday-notice" style="color:var(--danger); font-size:0.8rem; font-weight: normal;"></span></label>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 5px;">
+                <label class="switch">
+                    <input type="checkbox" id="s-cupboard" onchange="updateDisp()">
+                    <span class="slider"></span>
+                </label>
                 <span id="d-cupboard" class="score-display">0</span>
             </div>
 
@@ -227,27 +240,29 @@
 
 <script>
     // --- Clock & Friday Logic ---
+    let testFridayOverride = false;
+
     function updateDateAndCupboard() {
         const now = new Date();
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('current-date-display').innerText = now.toLocaleDateString('en-US', options);
 
-        const isFriday = now.getDay() === 5; // 5 = Friday
-        const cupSlider = document.getElementById('s-cupboard');
+        const isFriday = (now.getDay() === 5) || testFridayOverride; 
+        const cupToggle = document.getElementById('s-cupboard');
         const fridayNotice = document.getElementById('friday-notice');
         
         if (!isFriday) {
-            cupSlider.disabled = true;
-            cupSlider.value = 0;
+            cupToggle.disabled = true;
+            cupToggle.checked = false;
             fridayNotice.innerText = "(🔒 Checked on Fridays Only)";
             document.getElementById('total-val-max').innerText = "15";
         } else {
-            cupSlider.disabled = false;
-            fridayNotice.innerText = "(✅ Friday Check Active!)";
+            cupToggle.disabled = false;
+            fridayNotice.innerText = "(✅ Friday Mode Active!)";
             document.getElementById('total-val-max').innerText = "20";
         }
+        updateDisp(); // Recalculate total immediately
     }
-    updateDateAndCupboard();
 
     // --- Quotes Generator ---
     const quoteData = [
@@ -263,8 +278,7 @@
         }
         document.getElementById('quote-scroller').innerHTML = html + html; 
     }
-    generateQuotes();
-
+    
     // --- Core Logic ---
     let currentGrade = 8;
     const sections = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
@@ -299,7 +313,10 @@
         const w = parseInt(document.getElementById('s-water').value);
         const p = parseInt(document.getElementById('s-paper').value);
         const a = parseInt(document.getElementById('s-arrange').value);
-        const c = document.getElementById('s-cupboard').disabled ? 0 : parseInt(document.getElementById('s-cupboard').value);
+        
+        // Toggle Logic: If checked and not disabled, 5 points. Else 0.
+        const toggleEl = document.getElementById('s-cupboard');
+        const c = (!toggleEl.disabled && toggleEl.checked) ? 5 : 0;
         
         document.getElementById('d-water').innerText = w;
         document.getElementById('d-paper').innerText = p;
@@ -334,11 +351,11 @@
         localStorage.setItem(`bbps_win_${currentGrade}`, `${currentGrade}${sec}`);
         localStorage.setItem(`bbps_win_date_${currentGrade}`, todayDate);
 
-        // Reset sliders
+        // Reset inputs
         document.getElementById('s-water').value = 0;
         document.getElementById('s-paper').value = 0;
         document.getElementById('s-arrange').value = 0;
-        if(!document.getElementById('s-cupboard').disabled) document.getElementById('s-cupboard').value = 0;
+        document.getElementById('s-cupboard').checked = false;
         updateDisp();
 
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
@@ -358,7 +375,7 @@
             localStorage.setItem(`bbps_history_${currentGrade}`, JSON.stringify(history));
         }
 
-        // Reset Weekly Data ONLY (Month/Year stay safe)
+        // Reset Weekly Data ONLY
         localStorage.removeItem(`bbps_scores_${currentGrade}`);
         
         loadData();
@@ -438,7 +455,15 @@
         }
     }
 
+    function forceFriday() {
+        testFridayOverride = !testFridayOverride;
+        updateDateAndCupboard();
+        alert(testFridayOverride ? "🧪 Test Friday Mode ON! Cupboard unlocked." : "🛑 Test Mode OFF! Returned to real day.");
+    }
+
     // Init App
+    generateQuotes();
+    updateDateAndCupboard();
     initChart();
     loadData();
 </script>
