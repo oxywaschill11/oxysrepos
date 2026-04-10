@@ -35,10 +35,10 @@
         .grade-btn { padding: 12px 35px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; font-size: 1.2rem; transition: all 0.3s; background: #cbd5e1; color: #475569; }
         .grade-btn.active { background: var(--dark); color: white; transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
-        /* Marquee */
+        /* Marquee - SLOWED DOWN TO 600s */
         .marquee-container { width: 100%; overflow: hidden; background: rgba(0,0,0,0.2); padding: 12px 0; margin-top: 15px; border-radius: 10px; display: flex; align-items: center; }
-        .marquee-content { display: flex; white-space: nowrap; animation: scroll-left 350s linear infinite; }
-        .quote-item { display: flex; align-items: center; font-style: italic; font-size: 0.95rem; margin-right: 50px; font-weight: 600; }
+        .marquee-content { display: flex; white-space: nowrap; animation: scroll-left 600s linear infinite; }
+        .quote-item { display: flex; align-items: center; font-style: italic; font-size: 0.95rem; margin-right: 60px; font-weight: 600; }
         .quote-author { font-weight: 800; color: var(--gold); margin-left: 8px; }
         .anim-avatar { font-size: 1.5rem; margin-right: 12px; animation: bounce 2s infinite ease-in-out; display: inline-block; }
 
@@ -52,28 +52,27 @@
 
         label { display: block; margin: 15px 0 5px; font-weight: 600; }
         select, input[type="range"], input[type="number"] { width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; font-family: inherit; }
-        
+        input[type="range"]:disabled { opacity: 0.3; cursor: not-allowed; }
+
         /* Toggle Switch CSS */
-        .switch { position: relative; display: inline-block; width: 54px; height: 28px; margin-top: 5px;}
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(26px); }
-        input:disabled + .slider { background-color: #f1f5f9; cursor: not-allowed; border: 1px solid #e2e8f0; }
-        input:disabled + .slider:before { background-color: #cbd5e1; }
+        .slider-toggle { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
+        .slider-toggle:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider-toggle { background-color: var(--primary); }
+        input:checked + .slider-toggle:before { transform: translateX(24px); }
 
         .score-display { font-weight: 800; color: var(--accent); font-size: 1.2rem; min-width: 25px; text-align: right; }
         
         button { font-family: inherit; }
         button.submit-btn { background: var(--dark); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         button.submit-btn:hover { background: var(--accent); }
-        button.archive-btn { background: #8b5cf6; color: white; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        button.submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
         button.print-btn { background: #0ea5e9; color: white; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
         /* Editor Mode */
         .admin-login-btn { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 20px; }
-        #editor-panel { display: none; background: #fff1f2; border: 2px solid var(--danger); }
+        #editor-panel { display: none; background: #fff1f2; border: 2px solid var(--danger); margin-bottom: 20px; padding: 15px; border-radius: 15px;}
         .admin-action-btn { background: #fb923c; color: white; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.85rem; font-weight: bold; margin-top: 5px; width: 100%;}
 
         /* Badges */
@@ -120,12 +119,12 @@
 <div class="container">
     <div class="input-section">
         
-        <button class="admin-login-btn" id="login-btn" onclick="loginEditor()">🛠️ UNLOCK EDITOR MODE</button>
+        <button class="admin-login-btn" id="login-btn" onclick="loginEditor()">🛠️ UNLOCK ADMIN PANEL</button>
         
-        <div class="card" id="editor-panel">
-            <div style="background:var(--danger); color:white; padding:10px; text-align:center; font-weight:bold; border-radius:8px; margin-bottom: 10px;">EDITOR ACTIVE</div>
+        <div id="editor-panel">
+            <div style="background:var(--danger); color:white; padding:10px; text-align:center; font-weight:bold; border-radius:8px; margin-bottom: 10px;">ADMIN ACTIVE</div>
             
-            <label>Set Weekly Score:</label>
+            <label>Override Weekly Score:</label>
             <div style="display:flex; gap:10px;">
                 <select id="edit-section" style="width: 50%;">
                     <option value="A">A</option> <option value="B">B</option> <option value="C">C</option>
@@ -134,11 +133,12 @@
                 </select>
                 <input type="number" id="edit-score" placeholder="Score" style="width: 50%;">
             </div>
-            <button class="submit-btn" style="margin-top:10px; padding:10px;" onclick="forceSave()">💾 Save Changes</button>
+            <button class="submit-btn" style="margin-top:10px; padding:10px;" onclick="forceSave()">💾 Save Value</button>
             <hr style="margin: 15px 0; border:1px solid #fecdd3;">
-            <button class="admin-action-btn" onclick="resetPeriod('month')">⚠️ Reset Monthly Stats</button>
-            <button class="admin-action-btn" style="background: #ef4444;" onclick="resetPeriod('year')">⚠️ Reset Yearly Stats</button>
-            <button class="admin-action-btn" style="background: #10b981; margin-top: 15px;" onclick="forceFriday()">🧪 Test Friday Mode</button>
+            <button class="admin-action-btn" style="background:#8b5cf6;" onclick="manualEndWeek()">🏆 Force End Week Early</button>
+            <button class="admin-action-btn" onclick="resetPeriod('month')">⚠️ Reset Monthly History</button>
+            <button class="admin-action-btn" style="background: #ef4444;" onclick="resetPeriod('year')">⚠️ Reset Yearly History</button>
+            <button class="admin-action-btn" style="background: #10b981; margin-top: 15px;" onclick="forceFriday()">🧪 Toggle Friday Test Mode</button>
         </div>
 
         <div class="card">
@@ -168,13 +168,22 @@
                 <span id="d-arrange" class="score-display">0</span>
             </div>
 
-            <label>🚪 Cupboard Organized? (5 pts) <span id="friday-notice" style="color:var(--danger); font-size:0.8rem; font-weight: normal;"></span></label>
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 5px;">
-                <label class="switch">
-                    <input type="checkbox" id="s-cupboard" onchange="updateDisp()">
-                    <span class="slider"></span>
-                </label>
-                <span id="d-cupboard" class="score-display">0</span>
+            <div id="cupboard-section" style="display: none; background: #fffbeb; padding: 10px; border-radius: 10px; border: 2px dashed #fbbf24; margin-top: 15px;">
+                <label style="color: #b45309; margin-top:0;">🚪 Cupboard Check (Friday Mode)</label>
+                
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px;">
+                    <span style="font-size: 0.9rem; font-weight: 600;">Enable Cupboard Scoring?</span>
+                    <label class="switch">
+                        <input type="checkbox" id="cupboard-toggle" onchange="toggleCupboard()">
+                        <span class="slider-toggle"></span>
+                    </label>
+                </div>
+
+                <label style="font-size: 0.85rem;">Score (0-5)</label>
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <input type="range" id="s-cupboard" min="0" max="5" value="0" disabled oninput="updateDisp()">
+                    <span id="d-cupboard" class="score-display" style="color: #b45309;">0</span>
+                </div>
             </div>
 
             <div style="text-align:center; margin-top:20px; font-size:1.1rem; font-weight:800; background:#f1f5f9; padding:10px; border-radius:10px;">
@@ -182,7 +191,6 @@
             </div>
             
             <button id="award-btn" class="submit-btn" onclick="addPoints()">✅ Award Points</button>
-            <button class="archive-btn" onclick="endWeek()">🏆 End Week & Archive</button>
             <button class="print-btn" onclick="window.print()">🖨️ Print Report</button>
         </div>
     </div>
@@ -197,26 +205,26 @@
             </div>
             <div class="badge-card" style="border-top: 4px solid var(--secondary);">
                 <span style="font-size:1.5rem;">🔥</span>
-                <div style="font-size:0.75rem; font-weight:bold; color:#666;">WEEKLY LEADER</div>
-                <div class="badge-winner" id="badge-leader">-</div>
-                <span class="badge-date">Highest This Week</span>
+                <div style="font-size:0.75rem; font-weight:bold; color:#666;">LAST WEEK</div>
+                <div class="badge-winner" id="badge-weekly">Pending</div>
+                <span class="badge-date">Previous Week</span>
             </div>
             <div class="badge-card" style="border-top: 4px solid #8b5cf6;">
                 <span style="font-size:1.5rem;">📅</span>
-                <div style="font-size:0.75rem; font-weight:bold; color:#666;">MONTHLY LEADER</div>
-                <div class="badge-winner" id="badge-monthly">-</div>
-                <span class="badge-date">Highest This Month</span>
+                <div style="font-size:0.75rem; font-weight:bold; color:#666;">LAST MONTH</div>
+                <div class="badge-winner" id="badge-monthly">Pending</div>
+                <span class="badge-date">Previous Month</span>
             </div>
             <div class="badge-card" style="border-top: 4px solid var(--gold);">
                 <span style="font-size:1.5rem;">👑</span>
-                <div style="font-size:0.75rem; font-weight:bold; color:#666;">YEARLY WINNER</div>
-                <div class="badge-winner" id="badge-yearly">-</div>
-                <span class="badge-date">Overall Champion</span>
+                <div style="font-size:0.75rem; font-weight:bold; color:#666;">LAST YEAR</div>
+                <div class="badge-winner" id="badge-yearly">Pending</div>
+                <span class="badge-date">Previous Year</span>
             </div>
         </div>
 
         <div class="card">
-            <h2>📊 Weekly Leaderboard</h2>
+            <h2>📊 Current Week's Live Board</h2>
             <canvas id="cleanChart"></canvas>
         </div>
 
@@ -239,8 +247,25 @@
 </div>
 
 <script>
-    // --- Clock & Friday Logic ---
+    // --- Clock, Sunday Lock & Friday Logic ---
     let testFridayOverride = false;
+
+    function getFormattedDateShort() {
+        return new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function toggleCupboard() {
+        const toggle = document.getElementById('cupboard-toggle');
+        const slider = document.getElementById('s-cupboard');
+        
+        if(toggle.checked) {
+            slider.disabled = false;
+        } else {
+            slider.disabled = true;
+            slider.value = 0;
+        }
+        updateDisp();
+    }
 
     function updateDateAndCupboard() {
         const now = new Date();
@@ -248,28 +273,44 @@
         document.getElementById('current-date-display').innerText = now.toLocaleDateString('en-US', options);
 
         const isFriday = (now.getDay() === 5) || testFridayOverride; 
-        const cupToggle = document.getElementById('s-cupboard');
-        const fridayNotice = document.getElementById('friday-notice');
+        const isSunday = (now.getDay() === 0);
         
-        if (!isFriday) {
-            cupToggle.disabled = true;
-            cupToggle.checked = false;
-            fridayNotice.innerText = "(🔒 Checked on Fridays Only)";
-            document.getElementById('total-val-max').innerText = "15";
+        const cupSection = document.getElementById('cupboard-section');
+        const awardBtn = document.getElementById('award-btn');
+        
+        // Sunday Lock Logic
+        if(isSunday && !testFridayOverride) {
+            awardBtn.disabled = true;
+            awardBtn.innerText = "🔒 Locked (Sunday Reset Day)";
         } else {
-            cupToggle.disabled = false;
-            fridayNotice.innerText = "(✅ Friday Mode Active!)";
-            document.getElementById('total-val-max').innerText = "20";
+            awardBtn.disabled = false;
+            awardBtn.innerText = "✅ Award Points";
         }
-        updateDisp(); // Recalculate total immediately
+
+        // Friday Cupboard Visibility Logic
+        if (isFriday) {
+            cupSection.style.display = "block";
+        } else {
+            cupSection.style.display = "none";
+            document.getElementById('cupboard-toggle').checked = false;
+            document.getElementById('s-cupboard').value = 0;
+            document.getElementById('s-cupboard').disabled = true;
+        }
+        updateDisp(); 
     }
 
     // --- Quotes Generator ---
     const quoteData = [
         { emoji: "👨🏽‍🦲", text: "Cleanliness is next to Godliness.", author: "Mahatma Gandhi" },
-        { emoji: "👨🏽‍🦲", text: "Cleanliness is the hallmark of perfect standards and the best quality inspector is the conscience..", author: "Mahatma Gandhi" },
-        { emoji: "👨🏽‍🦲", text: "Be the change you want to see in the world.", author: "Mahatma Gandhi" },
-        { emoji: "🏫", text: "BBPS Goal: Every Class must reach max Points Daily!", author: "BBPS Official" }
+        { emoji: "✨", text: "A clean space is a clear mind.", author: "Zen Proverb" },
+        { emoji: "🌍", text: "Be the change you want to see in the world.", author: "Mahatma Gandhi" },
+        { emoji: "🏫", text: "BBPS Goal: Every Class must reach max Points Daily!", author: "BBPS Official" },
+        { emoji: "🧹", text: "Sweeping away the mess, sweeping in the success.", author: "Anonymous" },
+        { emoji: "🗑️", text: "Trash belongs in the bin, not on the floor.", author: "Eco Warrior" },
+        { emoji: "🌱", text: "Respect your environment, respect yourself.", author: "Earth Day" },
+        { emoji: "🏆", text: "Champions play in clean arenas.", author: "Sports Coach" },
+        { emoji: "📚", text: "Messy desks make messy minds.", author: "Teacher's Wisdom" },
+        { emoji: "🧼", text: "Clean up your act, clean up your classroom.", author: "Principal" }
     ];
 
     function generateQuotes() {
@@ -280,10 +321,72 @@
         document.getElementById('quote-scroller').innerHTML = html + html; 
     }
     
-    // --- Core Logic ---
+    // --- Core Logic & Auto Rollover ---
     let currentGrade = 8;
     const sections = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
     let chart;
+
+    function getTopScorer(scoreObj) {
+        let highest = -1; let leader = "-";
+        for (const [sec, score] of Object.entries(scoreObj)) {
+            if (score > highest && score > 0) { highest = score; leader = `${currentGrade}${sec}`; }
+        }
+        return leader;
+    }
+
+    function runAutoRollovers() {
+        const now = new Date();
+        const curWeek = now.getFullYear() + "-W" + Math.ceil(now.getDate() / 7); // Basic week ID
+        const curMonth = now.getFullYear() + "-" + now.getMonth();
+        const curYear = now.getFullYear().toString();
+
+        let sWeek = localStorage.getItem('bbps_cur_wk') || curWeek;
+        let sMonth = localStorage.getItem('bbps_cur_mo') || curMonth;
+        let sYear = localStorage.getItem('bbps_cur_yr') || curYear;
+
+        // Auto End Week (If week ID changed, or if it's Sunday and we haven't reset yet)
+        if (sWeek !== curWeek || (now.getDay() === 0 && localStorage.getItem('bbps_sunday_lock') !== curWeek)) {
+            [7, 8].forEach(g => {
+                currentGrade = g;
+                let scores = JSON.parse(localStorage.getItem(`bbps_scores_${g}`)) || {};
+                let winner = getTopScorer(scores);
+                if (winner !== "-") {
+                    localStorage.setItem(`bbps_last_week_winner_${g}`, winner);
+                    let hist = JSON.parse(localStorage.getItem(`bbps_history_${g}`)) || [];
+                    hist.unshift({ date: getFormattedDateShort(), winner: winner });
+                    localStorage.setItem(`bbps_history_${g}`, JSON.stringify(hist));
+                }
+                localStorage.removeItem(`bbps_scores_${g}`); // Reset board
+            });
+            localStorage.setItem('bbps_sunday_lock', curWeek);
+            localStorage.setItem('bbps_cur_wk', curWeek);
+        }
+
+        // Auto End Month
+        if (sMonth !== curMonth) {
+            [7, 8].forEach(g => {
+                currentGrade = g;
+                let mScores = JSON.parse(localStorage.getItem(`bbps_m_scores_${g}`)) || {};
+                let winner = getTopScorer(mScores);
+                if(winner !== "-") localStorage.setItem(`bbps_last_month_winner_${g}`, winner);
+                localStorage.removeItem(`bbps_m_scores_${g}`);
+            });
+            localStorage.setItem('bbps_cur_mo', curMonth);
+        }
+
+        // Auto End Year
+        if (sYear !== curYear) {
+            [7, 8].forEach(g => {
+                currentGrade = g;
+                let yScores = JSON.parse(localStorage.getItem(`bbps_y_scores_${g}`)) || {};
+                let winner = getTopScorer(yScores);
+                if(winner !== "-") localStorage.setItem(`bbps_last_year_winner_${g}`, winner);
+                localStorage.removeItem(`bbps_y_scores_${g}`);
+            });
+            localStorage.setItem('bbps_cur_yr', curYear);
+        }
+        currentGrade = 8; // Reset back to default
+    }
 
     function initChart() {
         const ctx = document.getElementById('cleanChart').getContext('2d');
@@ -292,8 +395,7 @@
             data: {
                 labels: sections,
                 datasets: [{ 
-                    label: 'Points', 
-                    data: new Array(9).fill(0), 
+                    label: 'Points', data: new Array(9).fill(0), 
                     backgroundColor: ['#4ADE80', '#38BDF8', '#F472B6', '#A78BFA', '#FBBF24', '#4ADE80', '#38BDF8', '#F472B6', '#A78BFA'],
                     borderRadius: 5
                 }]
@@ -315,19 +417,25 @@
         const p = parseInt(document.getElementById('s-paper').value);
         const a = parseInt(document.getElementById('s-arrange').value);
         
-        // Toggle Logic: If checked and not disabled, 5 points. Else 0.
-        const toggleEl = document.getElementById('s-cupboard');
-        const c = (!toggleEl.disabled && toggleEl.checked) ? 5 : 0;
+        const cupToggle = document.getElementById('cupboard-toggle');
+        const cupSlider = document.getElementById('s-cupboard');
+        const c = (!cupSlider.disabled) ? parseInt(cupSlider.value) : 0;
         
         document.getElementById('d-water').innerText = w;
         document.getElementById('d-paper').innerText = p;
         document.getElementById('d-arrange').innerText = a;
         document.getElementById('d-cupboard').innerText = c;
-        document.getElementById('total-val').innerText = w + p + a + c;
-    }
+        
+        const total = w + p + a + c;
+        document.getElementById('total-val').innerText = total;
 
-    function getFormattedDateShort() {
-        return new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        // Dynamic Max Score Display
+        const cupSection = document.getElementById('cupboard-section');
+        if(cupSection.style.display === "block" && cupToggle.checked) {
+            document.getElementById('total-val-max').innerText = "20";
+        } else {
+            document.getElementById('total-val-max').innerText = "15";
+        }
     }
 
     function addPoints() {
@@ -335,16 +443,16 @@
         const pts = parseInt(document.getElementById('total-val').innerText);
         const todayDate = getFormattedDateShort();
 
-        // Save Weekly Scores
+        // Save Weekly, Monthly, Yearly
         let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
-        scores[sec] = (scores[sec] || 0) + pts;
-        localStorage.setItem(`bbps_scores_${currentGrade}`, JSON.stringify(scores));
-
-        // Save Monthly & Yearly Totals
         let mScores = JSON.parse(localStorage.getItem(`bbps_m_scores_${currentGrade}`)) || {};
         let yScores = JSON.parse(localStorage.getItem(`bbps_y_scores_${currentGrade}`)) || {};
+        
+        scores[sec] = (scores[sec] || 0) + pts;
         mScores[sec] = (mScores[sec] || 0) + pts;
         yScores[sec] = (yScores[sec] || 0) + pts;
+        
+        localStorage.setItem(`bbps_scores_${currentGrade}`, JSON.stringify(scores));
         localStorage.setItem(`bbps_m_scores_${currentGrade}`, JSON.stringify(mScores));
         localStorage.setItem(`bbps_y_scores_${currentGrade}`, JSON.stringify(yScores));
 
@@ -356,58 +464,26 @@
         document.getElementById('s-water').value = 0;
         document.getElementById('s-paper').value = 0;
         document.getElementById('s-arrange').value = 0;
-        document.getElementById('s-cupboard').checked = false;
-        updateDisp();
+        document.getElementById('s-cupboard').value = 0;
+        document.getElementById('cupboard-toggle').checked = false;
+        toggleCupboard();
 
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
         loadData();
     }
 
-    function endWeek() {
-        if(!confirm(`⚠️ Archive scores for Class ${currentGrade}?\nThis saves the current winner to History and RESETS the Weekly leaderboard to 0.`)) return;
-        
-        const leader = document.getElementById('badge-leader').innerText;
-        const todayDate = getFormattedDateShort();
-
-        // Save to History
-        if (leader !== "-") {
-            let history = JSON.parse(localStorage.getItem(`bbps_history_${currentGrade}`)) || [];
-            history.unshift({ date: todayDate, winner: leader });
-            localStorage.setItem(`bbps_history_${currentGrade}`, JSON.stringify(history));
-        }
-
-        // Reset Weekly Data ONLY
-        localStorage.removeItem(`bbps_scores_${currentGrade}`);
-        
-        loadData();
-        confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
-    }
-
-    function getTopScorer(scoreObj) {
-        let highest = -1;
-        let leader = "-";
-        for (const [sec, score] of Object.entries(scoreObj)) {
-            if (score > highest && score > 0) { highest = score; leader = `${currentGrade}${sec}`; }
-        }
-        return leader;
-    }
-
     function loadData() {
-        // Load Weekly Data
+        // Load Weekly Board
         let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
         chart.data.datasets[0].data = sections.map(s => scores[s] || 0);
         chart.update();
 
-        // Load Monthly & Yearly Data
-        let mScores = JSON.parse(localStorage.getItem(`bbps_m_scores_${currentGrade}`)) || {};
-        let yScores = JSON.parse(localStorage.getItem(`bbps_y_scores_${currentGrade}`)) || {};
-
-        // Badges
+        // Load Badges (Last period winners)
         document.getElementById('badge-daily').innerText = localStorage.getItem(`bbps_win_${currentGrade}`) || "-";
         document.getElementById('badge-daily-date').innerText = localStorage.getItem(`bbps_win_date_${currentGrade}`) || "No date yet";
-        document.getElementById('badge-leader').innerText = getTopScorer(scores);
-        document.getElementById('badge-monthly').innerText = getTopScorer(mScores);
-        document.getElementById('badge-yearly').innerText = getTopScorer(yScores);
+        document.getElementById('badge-weekly').innerText = localStorage.getItem(`bbps_last_week_winner_${currentGrade}`) || "Pending";
+        document.getElementById('badge-monthly').innerText = localStorage.getItem(`bbps_last_month_winner_${currentGrade}`) || "Pending";
+        document.getElementById('badge-yearly').innerText = localStorage.getItem(`bbps_last_year_winner_${currentGrade}`) || "Pending";
 
         // Load History Archive
         const tbody = document.getElementById('history-body');
@@ -435,22 +511,38 @@
     function forceSave() {
         const sec = document.getElementById('edit-section').value;
         const val = parseInt(document.getElementById('edit-score').value);
-        if(isNaN(val)) { alert("Enter a valid number!"); return; }
+        if(isNaN(val)) return;
 
         let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
         scores[sec] = val;
         localStorage.setItem(`bbps_scores_${currentGrade}`, JSON.stringify(scores));
         
         document.getElementById('edit-score').value = "";
-        alert(`✅ Class ${currentGrade}${sec} Weekly Score updated to ${val}!`);
+        alert(`✅ Weekly Score updated!`);
         loadData();
     }
 
+    function manualEndWeek() {
+        if(!confirm(`⚠️ Force End Week?\nThis saves the current leader as Last Week's Winner and resets the live board.`)) return;
+        let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
+        let leader = getTopScorer(scores);
+        
+        if (leader !== "-") {
+            localStorage.setItem(`bbps_last_week_winner_${currentGrade}`, leader);
+            let hist = JSON.parse(localStorage.getItem(`bbps_history_${currentGrade}`)) || [];
+            hist.unshift({ date: getFormattedDateShort(), winner: leader });
+            localStorage.setItem(`bbps_history_${currentGrade}`, JSON.stringify(hist));
+        }
+        localStorage.removeItem(`bbps_scores_${currentGrade}`);
+        loadData();
+        confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+    }
+
     function resetPeriod(type) {
-        let code = prompt(`Type RESET to clear the ${type.toUpperCase()} stats for Class ${currentGrade}:`);
+        let code = prompt(`Type RESET to clear the ${type.toUpperCase()} past winners for Class ${currentGrade}:`);
         if(code === "RESET") {
-            if(type === 'month') localStorage.removeItem(`bbps_m_scores_${currentGrade}`);
-            if(type === 'year') localStorage.removeItem(`bbps_y_scores_${currentGrade}`);
+            if(type === 'month') localStorage.removeItem(`bbps_last_month_winner_${currentGrade}`);
+            if(type === 'year') localStorage.removeItem(`bbps_last_year_winner_${currentGrade}`);
             alert(`✅ ${type.toUpperCase()} stats cleared.`);
             loadData();
         }
@@ -459,10 +551,11 @@
     function forceFriday() {
         testFridayOverride = !testFridayOverride;
         updateDateAndCupboard();
-        alert(testFridayOverride ? "🧪 Test Friday Mode ON! Cupboard unlocked." : "🛑 Test Mode OFF! Returned to real day.");
+        alert(testFridayOverride ? "🧪 Test Friday Mode ON! Cupboard menu visible." : "🛑 Test Mode OFF! Returned to real day.");
     }
 
     // Init App
+    runAutoRollovers();
     generateQuotes();
     updateDateAndCupboard();
     initChart();
