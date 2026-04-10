@@ -287,15 +287,15 @@
         checkIfScored(); // Checks if Sunday or if section already scored
     }
 
-    // --- ONE-TIME SCORING LOCK LOGIC ---
+    // --- ONE-TIME SCORING LOCK LOGIC (RESETS AT MIDNIGHT) ---
     function checkIfScored() {
         const sec = document.getElementById('section-selector').value;
-        const todayDate = getFormattedDateShort();
+        const todayDate = getFormattedDateShort(); // This changes instantly at 12:00 AM
         
         // Fetch what has been scored today
         let scoredData = JSON.parse(localStorage.getItem(`bbps_scored_today_${currentGrade}`)) || { date: "", sections: [] };
         
-        // If it's a new day, clear the list
+        // IF IT IS A NEW DAY (Past Midnight), CLEAR THE LOCKS!
         if(scoredData.date !== todayDate) {
             scoredData = { date: todayDate, sections: [] };
             localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify(scoredData));
@@ -309,7 +309,8 @@
             awardBtn.innerText = "🔒 Locked (Sunday Reset Day)";
         } else if (scoredData.sections.includes(sec)) {
             awardBtn.disabled = true;
-            awardBtn.innerText = `🚫 Section ${sec} Already Scored Today`;
+            // NEW CLEARER TEXT ADDED HERE
+            awardBtn.innerText = `🚫 Scored - Unlocks at 12:00 AM`; 
         } else {
             awardBtn.disabled = false;
             awardBtn.innerText = "✅ Award Points";
@@ -317,7 +318,6 @@
     }
 
     function unlockAllSections() {
-        // Admin tool to reset the locks for the day
         const todayDate = getFormattedDateShort();
         localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify({ date: todayDate, sections: [] }));
         checkIfScored();
@@ -554,18 +554,15 @@
         confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
     }
 
-    // NEW: Clear Live Board Function
+    // Clear Live Board Function
     function clearCurrentPoints() {
         if(!confirm(`⚠️ Are you sure you want to completely WIPE all points for Class ${currentGrade} on the live board?\n\nThis cannot be undone!`)) return;
         
-        // Remove the current scores for this class
         localStorage.removeItem(`bbps_scores_${currentGrade}`);
         
-        // Unlock all sections for the day so they can be re-scored
         const todayDate = getFormattedDateShort();
         localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify({ date: todayDate, sections: [] }));
         
-        // Reload the UI
         loadData();
         checkIfScored();
         
