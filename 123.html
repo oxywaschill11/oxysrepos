@@ -35,7 +35,7 @@
         .grade-btn { padding: 12px 35px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; font-size: 1.2rem; transition: all 0.3s; background: #cbd5e1; color: #475569; }
         .grade-btn.active { background: var(--dark); color: white; transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
-        /* Marquee - SLOWED DOWN TO 600s */
+        /* Marquee */
         .marquee-container { width: 100%; overflow: hidden; background: rgba(0,0,0,0.2); padding: 12px 0; margin-top: 15px; border-radius: 10px; display: flex; align-items: center; }
         .marquee-content { display: flex; white-space: nowrap; animation: scroll-left 600s linear infinite; }
         .quote-item { display: flex; align-items: center; font-style: italic; font-size: 0.95rem; margin-right: 60px; font-weight: 600; }
@@ -66,8 +66,8 @@
         
         button { font-family: inherit; }
         button.submit-btn { background: var(--dark); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        button.submit-btn:hover { background: var(--accent); }
-        button.submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+        button.submit-btn:hover:not(:disabled) { background: var(--accent); }
+        button.submit-btn:disabled { background: #94a3b8 !important; cursor: not-allowed; }
         button.print-btn { background: #0ea5e9; color: white; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
         /* Editor Mode */
@@ -133,18 +133,20 @@
                 </select>
                 <input type="number" id="edit-score" placeholder="Score" style="width: 50%;">
             </div>
-            <button class="submit-btn" style="margin-top:10px; padding:10px;" onclick="forceSave()">💾 Save Value</button>
+            <button class="submit-btn" style="margin-top:10px; padding:10px; background:var(--dark);" onclick="forceSave()">💾 Save Value</button>
             <hr style="margin: 15px 0; border:1px solid #fecdd3;">
             <button class="admin-action-btn" style="background:#8b5cf6;" onclick="manualEndWeek()">🏆 Force End Week Early</button>
+            <button class="admin-action-btn" style="background: #eab308; margin-top: 15px;" onclick="clearCurrentPoints()">🧹 Clear Current Live Board</button>
             <button class="admin-action-btn" onclick="resetPeriod('month')">⚠️ Reset Monthly History</button>
             <button class="admin-action-btn" style="background: #ef4444;" onclick="resetPeriod('year')">⚠️ Reset Yearly History</button>
             <button class="admin-action-btn" style="background: #10b981; margin-top: 15px;" onclick="forceFriday()">🧪 Toggle Friday Test Mode</button>
+            <button class="admin-action-btn" style="background: #0ea5e9; margin-top: 5px;" onclick="unlockAllSections()">🔓 Unlock All Scored Sections</button>
         </div>
 
         <div class="card">
             <h2>📝 Judge's Panel</h2>
             <label>Select Section</label>
-            <select id="section-selector">
+            <select id="section-selector" onchange="checkIfScored()">
                 <option value="A">Section A</option> <option value="B">Section B</option> <option value="C">Section C</option>
                 <option value="D">Section D</option> <option value="E">Section E</option> <option value="F">Section F</option>
                 <option value="G">Section G</option> <option value="H">Section H</option> <option value="I">Section I</option>
@@ -249,6 +251,9 @@
 <script>
     // --- Clock, Sunday Lock & Friday Logic ---
     let testFridayOverride = false;
+    let currentGrade = 8;
+    const sections = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+    let chart;
 
     function getFormattedDateShort() {
         return new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -257,13 +262,7 @@
     function toggleCupboard() {
         const toggle = document.getElementById('cupboard-toggle');
         const slider = document.getElementById('s-cupboard');
-        
-        if(toggle.checked) {
-            slider.disabled = false;
-        } else {
-            slider.disabled = true;
-            slider.value = 0;
-        }
+        if(toggle.checked) { slider.disabled = false; } else { slider.disabled = true; slider.value = 0; }
         updateDisp();
     }
 
@@ -273,21 +272,8 @@
         document.getElementById('current-date-display').innerText = now.toLocaleDateString('en-US', options);
 
         const isFriday = (now.getDay() === 5) || testFridayOverride; 
-        const isSunday = (now.getDay() === 0);
-        
         const cupSection = document.getElementById('cupboard-section');
-        const awardBtn = document.getElementById('award-btn');
         
-        // Sunday Lock Logic
-        if(isSunday && !testFridayOverride) {
-            awardBtn.disabled = true;
-            awardBtn.innerText = "🔒 Locked (Sunday Reset Day)";
-        } else {
-            awardBtn.disabled = false;
-            awardBtn.innerText = "✅ Award Points";
-        }
-
-        // Friday Cupboard Visibility Logic
         if (isFriday) {
             cupSection.style.display = "block";
         } else {
@@ -296,7 +282,46 @@
             document.getElementById('s-cupboard').value = 0;
             document.getElementById('s-cupboard').disabled = true;
         }
+        
         updateDisp(); 
+        checkIfScored(); // Checks if Sunday or if section already scored
+    }
+
+    // --- ONE-TIME SCORING LOCK LOGIC ---
+    function checkIfScored() {
+        const sec = document.getElementById('section-selector').value;
+        const todayDate = getFormattedDateShort();
+        
+        // Fetch what has been scored today
+        let scoredData = JSON.parse(localStorage.getItem(`bbps_scored_today_${currentGrade}`)) || { date: "", sections: [] };
+        
+        // If it's a new day, clear the list
+        if(scoredData.date !== todayDate) {
+            scoredData = { date: todayDate, sections: [] };
+            localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify(scoredData));
+        }
+
+        const awardBtn = document.getElementById('award-btn');
+        const isSunday = (new Date().getDay() === 0) && !testFridayOverride;
+
+        if (isSunday) {
+            awardBtn.disabled = true;
+            awardBtn.innerText = "🔒 Locked (Sunday Reset Day)";
+        } else if (scoredData.sections.includes(sec)) {
+            awardBtn.disabled = true;
+            awardBtn.innerText = `🚫 Section ${sec} Already Scored Today`;
+        } else {
+            awardBtn.disabled = false;
+            awardBtn.innerText = "✅ Award Points";
+        }
+    }
+
+    function unlockAllSections() {
+        // Admin tool to reset the locks for the day
+        const todayDate = getFormattedDateShort();
+        localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify({ date: todayDate, sections: [] }));
+        checkIfScored();
+        alert(`✅ All sections for Class ${currentGrade} unlocked for today!`);
     }
 
     // --- Quotes Generator ---
@@ -308,9 +333,7 @@
         { emoji: "🧹", text: "Sweeping away the mess, sweeping in the success.", author: "Anonymous" },
         { emoji: "🗑️", text: "Trash belongs in the bin, not on the floor.", author: "Eco Warrior" },
         { emoji: "🌱", text: "Respect your environment, respect yourself.", author: "Earth Day" },
-        { emoji: "🏆", text: "Champions play in clean arenas.", author: "Sports Coach" },
-        { emoji: "📚", text: "Messy desks make messy minds.", author: "Teacher's Wisdom" },
-        { emoji: "🧼", text: "Clean up your act, clean up your classroom.", author: "Principal" }
+        { emoji: "🏆", text: "Champions play in clean arenas.", author: "Sports Coach" }
     ];
 
     function generateQuotes() {
@@ -322,10 +345,6 @@
     }
     
     // --- Core Logic & Auto Rollover ---
-    let currentGrade = 8;
-    const sections = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
-    let chart;
-
     function getTopScorer(scoreObj) {
         let highest = -1; let leader = "-";
         for (const [sec, score] of Object.entries(scoreObj)) {
@@ -336,7 +355,7 @@
 
     function runAutoRollovers() {
         const now = new Date();
-        const curWeek = now.getFullYear() + "-W" + Math.ceil(now.getDate() / 7); // Basic week ID
+        const curWeek = now.getFullYear() + "-W" + Math.ceil(now.getDate() / 7);
         const curMonth = now.getFullYear() + "-" + now.getMonth();
         const curYear = now.getFullYear().toString();
 
@@ -344,10 +363,9 @@
         let sMonth = localStorage.getItem('bbps_cur_mo') || curMonth;
         let sYear = localStorage.getItem('bbps_cur_yr') || curYear;
 
-        // Auto End Week (If week ID changed, or if it's Sunday and we haven't reset yet)
+        // Auto End Week
         if (sWeek !== curWeek || (now.getDay() === 0 && localStorage.getItem('bbps_sunday_lock') !== curWeek)) {
             [7, 8].forEach(g => {
-                currentGrade = g;
                 let scores = JSON.parse(localStorage.getItem(`bbps_scores_${g}`)) || {};
                 let winner = getTopScorer(scores);
                 if (winner !== "-") {
@@ -356,7 +374,7 @@
                     hist.unshift({ date: getFormattedDateShort(), winner: winner });
                     localStorage.setItem(`bbps_history_${g}`, JSON.stringify(hist));
                 }
-                localStorage.removeItem(`bbps_scores_${g}`); // Reset board
+                localStorage.removeItem(`bbps_scores_${g}`);
             });
             localStorage.setItem('bbps_sunday_lock', curWeek);
             localStorage.setItem('bbps_cur_wk', curWeek);
@@ -365,7 +383,6 @@
         // Auto End Month
         if (sMonth !== curMonth) {
             [7, 8].forEach(g => {
-                currentGrade = g;
                 let mScores = JSON.parse(localStorage.getItem(`bbps_m_scores_${g}`)) || {};
                 let winner = getTopScorer(mScores);
                 if(winner !== "-") localStorage.setItem(`bbps_last_month_winner_${g}`, winner);
@@ -377,7 +394,6 @@
         // Auto End Year
         if (sYear !== curYear) {
             [7, 8].forEach(g => {
-                currentGrade = g;
                 let yScores = JSON.parse(localStorage.getItem(`bbps_y_scores_${g}`)) || {};
                 let winner = getTopScorer(yScores);
                 if(winner !== "-") localStorage.setItem(`bbps_last_year_winner_${g}`, winner);
@@ -385,7 +401,6 @@
             });
             localStorage.setItem('bbps_cur_yr', curYear);
         }
-        currentGrade = 8; // Reset back to default
     }
 
     function initChart() {
@@ -410,13 +425,13 @@
         document.getElementById('btn-7').classList.toggle('active', grade === 7);
         document.getElementById('btn-8').classList.toggle('active', grade === 8);
         loadData();
+        checkIfScored(); // Check locks for the new grade
     }
 
     function updateDisp() {
         const w = parseInt(document.getElementById('s-water').value);
         const p = parseInt(document.getElementById('s-paper').value);
         const a = parseInt(document.getElementById('s-arrange').value);
-        
         const cupToggle = document.getElementById('cupboard-toggle');
         const cupSlider = document.getElementById('s-cupboard');
         const c = (!cupSlider.disabled) ? parseInt(cupSlider.value) : 0;
@@ -426,10 +441,8 @@
         document.getElementById('d-arrange').innerText = a;
         document.getElementById('d-cupboard').innerText = c;
         
-        const total = w + p + a + c;
-        document.getElementById('total-val').innerText = total;
+        document.getElementById('total-val').innerText = w + p + a + c;
 
-        // Dynamic Max Score Display
         const cupSection = document.getElementById('cupboard-section');
         if(cupSection.style.display === "block" && cupToggle.checked) {
             document.getElementById('total-val-max').innerText = "20";
@@ -443,7 +456,7 @@
         const pts = parseInt(document.getElementById('total-val').innerText);
         const todayDate = getFormattedDateShort();
 
-        // Save Weekly, Monthly, Yearly
+        // 1. Save Scores locally
         let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
         let mScores = JSON.parse(localStorage.getItem(`bbps_m_scores_${currentGrade}`)) || {};
         let yScores = JSON.parse(localStorage.getItem(`bbps_y_scores_${currentGrade}`)) || {};
@@ -456,7 +469,12 @@
         localStorage.setItem(`bbps_m_scores_${currentGrade}`, JSON.stringify(mScores));
         localStorage.setItem(`bbps_y_scores_${currentGrade}`, JSON.stringify(yScores));
 
-        // Save Today's Winner & Date
+        // 2. Add this section to the "Scored Today" Lock list
+        let scoredData = JSON.parse(localStorage.getItem(`bbps_scored_today_${currentGrade}`)) || { date: todayDate, sections: [] };
+        scoredData.sections.push(sec);
+        localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify(scoredData));
+
+        // 3. Save Today's Winner
         localStorage.setItem(`bbps_win_${currentGrade}`, `${currentGrade}${sec}`);
         localStorage.setItem(`bbps_win_date_${currentGrade}`, todayDate);
 
@@ -470,22 +488,20 @@
 
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
         loadData();
+        checkIfScored(); // Immediately lock the button since we just scored
     }
 
     function loadData() {
-        // Load Weekly Board
         let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
         chart.data.datasets[0].data = sections.map(s => scores[s] || 0);
         chart.update();
 
-        // Load Badges (Last period winners)
         document.getElementById('badge-daily').innerText = localStorage.getItem(`bbps_win_${currentGrade}`) || "-";
         document.getElementById('badge-daily-date').innerText = localStorage.getItem(`bbps_win_date_${currentGrade}`) || "No date yet";
         document.getElementById('badge-weekly').innerText = localStorage.getItem(`bbps_last_week_winner_${currentGrade}`) || "Pending";
         document.getElementById('badge-monthly').innerText = localStorage.getItem(`bbps_last_month_winner_${currentGrade}`) || "Pending";
         document.getElementById('badge-yearly').innerText = localStorage.getItem(`bbps_last_year_winner_${currentGrade}`) || "Pending";
 
-        // Load History Archive
         const tbody = document.getElementById('history-body');
         const noHistory = document.getElementById('no-history');
         let history = JSON.parse(localStorage.getItem(`bbps_history_${currentGrade}`)) || [];
@@ -499,7 +515,7 @@
         }
     }
 
-    // --- Editor Mode ---
+    // --- Admin Editor Mode ---
     function loginEditor() {
         let email = prompt("Enter Authorized Admin Email:");
         if (email === "217115@pp.balbharati.org") {
@@ -536,6 +552,24 @@
         localStorage.removeItem(`bbps_scores_${currentGrade}`);
         loadData();
         confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+    }
+
+    // NEW: Clear Live Board Function
+    function clearCurrentPoints() {
+        if(!confirm(`⚠️ Are you sure you want to completely WIPE all points for Class ${currentGrade} on the live board?\n\nThis cannot be undone!`)) return;
+        
+        // Remove the current scores for this class
+        localStorage.removeItem(`bbps_scores_${currentGrade}`);
+        
+        // Unlock all sections for the day so they can be re-scored
+        const todayDate = getFormattedDateShort();
+        localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify({ date: todayDate, sections: [] }));
+        
+        // Reload the UI
+        loadData();
+        checkIfScored();
+        
+        alert(`✅ Live board for Class ${currentGrade} has been reset to 0!`);
     }
 
     function resetPeriod(type) {
