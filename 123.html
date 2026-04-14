@@ -204,8 +204,8 @@
             <div class="badge-card" style="border-top: 4px solid var(--accent);">
                 <span style="font-size:1.5rem;">⭐</span>
                 <div style="font-size:0.75rem; font-weight:bold; color:#666;">TODAY'S WINNER</div>
-                <div class="badge-winner" id="badge-daily">-</div>
-                <span class="badge-date" id="badge-daily-date">-</span>
+                <div class="badge-winner" id="badge-daily">⏳ Pending...</div>
+                <span class="badge-date" id="badge-daily-date">Waiting on all classes</span>
             </div>
             <div class="badge-card" style="border-top: 4px solid var(--secondary);">
                 <span style="font-size:1.5rem;">🔥</span>
@@ -476,23 +476,15 @@
         if(!scoredData.sections.includes(sec)) scoredData.sections.push(sec);
         localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify(scoredData));
 
-        // 4. CHECK WINNER BASED ON CLASS GRADE
-        if (currentGrade === 7) {
-            // CLASS 7 LOGIC: Wait for all sections
-            if (scoredData.sections.length >= sections.length) {
-                let todayWinner = getTopScorer(dailyScores.scores);
-                localStorage.setItem(`bbps_win_7`, todayWinner);
-                localStorage.setItem(`bbps_win_date_7`, todayDate);
-                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-            } else {
-                localStorage.setItem(`bbps_win_7`, "⏳ Pending...");
-                localStorage.setItem(`bbps_win_date_7`, "Waiting on all classes");
-            }
-        } else {
-            // CLASS 8 LOGIC: Instant Winner Display
+        // 4. CHECK WINNER: Wait for all sections for ANY class grade selected
+        if (scoredData.sections.length >= sections.length) {
             let todayWinner = getTopScorer(dailyScores.scores);
-            localStorage.setItem(`bbps_win_8`, todayWinner);
-            localStorage.setItem(`bbps_win_date_8`, todayDate);
+            localStorage.setItem(`bbps_win_${currentGrade}`, todayWinner);
+            localStorage.setItem(`bbps_win_date_${currentGrade}`, todayDate);
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+        } else {
+            localStorage.setItem(`bbps_win_${currentGrade}`, "⏳ Pending...");
+            localStorage.setItem(`bbps_win_date_${currentGrade}`, "Waiting on all classes");
         }
 
         // Reset inputs
@@ -514,15 +506,8 @@
 
         // Read today's winner status
         const savedTodayWin = localStorage.getItem(`bbps_win_${currentGrade}`);
-        
-        // If it's Class 8 and empty, set default. If Class 7, respect the Pending logic.
-        if (!savedTodayWin) {
-            document.getElementById('badge-daily').innerText = currentGrade === 7 ? "⏳ Pending..." : "-";
-            document.getElementById('badge-daily-date').innerText = currentGrade === 7 ? "Waiting on all classes" : "No date yet";
-        } else {
-            document.getElementById('badge-daily').innerText = savedTodayWin;
-            document.getElementById('badge-daily-date').innerText = localStorage.getItem(`bbps_win_date_${currentGrade}`);
-        }
+        document.getElementById('badge-daily').innerText = savedTodayWin || "⏳ Pending...";
+        document.getElementById('badge-daily-date').innerText = localStorage.getItem(`bbps_win_date_${currentGrade}`) || "Waiting on all classes";
         
         document.getElementById('badge-weekly').innerText = localStorage.getItem(`bbps_last_week_winner_${currentGrade}`) || "Pending";
         document.getElementById('badge-monthly').innerText = localStorage.getItem(`bbps_last_month_winner_${currentGrade}`) || "Pending";
