@@ -287,7 +287,6 @@
         const fullDateStr = now.toLocaleDateString('en-US', options);
         
         document.getElementById('current-date-display').innerText = fullDateStr;
-        // UPDATE PRINT HEADER DATE
         document.getElementById('print-header-date').innerText = fullDateStr;
 
         const isFriday = (now.getDay() === 5) || testFridayOverride; 
@@ -312,6 +311,7 @@
         
         let scoredData = JSON.parse(localStorage.getItem(`bbps_scored_today_${currentGrade}`)) || { date: "", sections: [] };
         
+        // Clear scored sections if it's a new day
         if(scoredData.date !== todayDate) {
             scoredData = { date: todayDate, sections: [] };
             localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify(scoredData));
@@ -336,6 +336,7 @@
         const todayDate = getFormattedDateShort();
         localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify({ date: todayDate, sections: [] }));
         checkIfScored();
+        loadData();
         alert(`✅ All sections for Class ${currentGrade} unlocked for today!`);
     }
 
@@ -383,7 +384,6 @@
                     localStorage.setItem(`bbps_history_${g}`, JSON.stringify(hist));
                 }
                 localStorage.removeItem(`bbps_scores_${g}`);
-                // Clear Weekly Daily Winners Graph data
                 localStorage.removeItem(`bbps_week_daily_wins_${g}`);
             });
             localStorage.setItem('bbps_sunday_lock', curWeek);
@@ -412,7 +412,6 @@
     }
 
     function initCharts() {
-        // Chart 1: Main Cumulative Points
         const ctx1 = document.getElementById('cleanChart').getContext('2d');
         chartMain = new Chart(ctx1, {
             type: 'bar',
@@ -427,7 +426,6 @@
             options: { scales: { y: { beginAtZero: true } }, plugins: { legend: {display: false} } }
         });
 
-        // Chart 2: Daily Winners this week
         const ctx2 = document.getElementById('weeklyWinnersChart').getContext('2d');
         chartWeekly = new Chart(ctx2, {
             type: 'bar',
@@ -447,7 +445,7 @@
                         max: 9,
                         ticks: {
                             stepSize: 1,
-                            callback: function(value) { return numToSec[value] || ''; } // Maps numbers back to A-I
+                            callback: function(value) { return numToSec[value] || ''; } 
                         }
                     } 
                 }, 
@@ -469,7 +467,7 @@
     function switchGrade(grade) {
         currentGrade = grade;
         document.getElementById('grade-title').innerText = `CLASS ${grade} MODE`;
-        document.getElementById('print-header-grade').innerText = grade; // update print header
+        document.getElementById('print-header-grade').innerText = grade;
         document.getElementById('btn-7').classList.toggle('active', grade === 7);
         document.getElementById('btn-8').classList.toggle('active', grade === 8);
         loadData();
@@ -518,16 +516,13 @@
         if(!scoredData.sections.includes(sec)) scoredData.sections.push(sec);
         localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify(scoredData));
 
-        // BOTH CLASSES NOW WAIT FOR ALL 9 SECTIONS
         if (scoredData.sections.length >= sections.length) {
             let todayWinner = getTopScorer(dailyScores.scores);
             localStorage.setItem(`bbps_win_${currentGrade}`, todayWinner);
             localStorage.setItem(`bbps_win_date_${currentGrade}`, todayDate);
 
-            // Save to Weekly Daily Wins (For Chart 2)
             let dayStr = new Date().toLocaleDateString('en-US', { weekday: 'short' });
             let weeklyDailyWins = JSON.parse(localStorage.getItem(`bbps_week_daily_wins_${currentGrade}`)) || {};
-            // Extract just the letter (e.g. '8A' -> 'A')
             weeklyDailyWins[dayStr] = todayWinner.replace(currentGrade.toString(), ''); 
             localStorage.setItem(`bbps_week_daily_wins_${currentGrade}`, JSON.stringify(weeklyDailyWins));
 
@@ -537,7 +532,6 @@
             localStorage.setItem(`bbps_win_date_${currentGrade}`, "Waiting on all classes");
         }
 
-        // Reset inputs
         document.getElementById('s-water').value = 0;
         document.getElementById('s-paper').value = 0;
         document.getElementById('s-arrange').value = 0;
@@ -550,20 +544,39 @@
     }
 
     function loadData() {
+        const todayDate = getFormattedDateShort();
+
         // Update Chart 1
         let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
         chartMain.data.datasets[0].data = sections.map(s => scores[s] || 0);
         chartMain.update();
 
-        // Update Chart 2 (Weekly Daily Wins)
+        // Update Chart 2
         const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         let wdw = JSON.parse(localStorage.getItem(`bbps_week_daily_wins_${currentGrade}`)) || {};
         chartWeekly.data.datasets[0].data = days.map(d => wdw[d] ? secToNum[wdw[d]] : null);
         chartWeekly.update();
 
-        // Update Badges
-        document.getElementById('badge-daily').innerText = localStorage.getItem(`bbps_win_${currentGrade}`) || "⏳ Pending...";
-        document.getElementById('badge-daily-date').innerText = localStorage.getItem(`bbps_win_date_${currentGrade}`) || "Waiting on all classes";
+        // --- MIDNIGHT RESET / STRICT DAILY WINNER LOGIC ---
+        let scoredData = JSON.parse(localStorage.getItem(`bbps_scored_today_${currentGrade}`)) || { date: "", sections: [] };
+        
+        // If it's a new day, or we haven't scored all 9 sections today: Show Pending.
+        if (scoredData.date !== todayDate || scoredData.sections.length < sections.length) {
+            document.getElementById('badge-daily').innerText = "⏳ Pending...";
+            document.getElementById('badge-daily-date').innerText = "Waiting on all classes";
+            
+            // Clean up stale winner storage if it's from yesterday
+            if (scoredData.date !== todayDate) {
+                localStorage.setItem(`bbps_win_${currentGrade}`, "⏳ Pending...");
+                localStorage.setItem(`bbps_win_date_${currentGrade}`, "Waiting on all classes");
+            }
+        } else {
+            // All 9 scored today! Show the exact winner.
+            document.getElementById('badge-daily').innerText = localStorage.getItem(`bbps_win_${currentGrade}`);
+            document.getElementById('badge-daily-date').innerText = localStorage.getItem(`bbps_win_date_${currentGrade}`);
+        }
+
+        // Update other badges
         document.getElementById('badge-weekly').innerText = localStorage.getItem(`bbps_last_week_winner_${currentGrade}`) || "Pending";
         document.getElementById('badge-monthly').innerText = localStorage.getItem(`bbps_last_month_winner_${currentGrade}`) || "Pending";
         document.getElementById('badge-yearly').innerText = localStorage.getItem(`bbps_last_year_winner_${currentGrade}`) || "Pending";
@@ -659,6 +672,13 @@
     updateDateAndCupboard();
     initCharts();
     loadData();
+
+    // BACKGROUND TIMER: Automatically checks for midnight date-change every 60 seconds
+    setInterval(() => {
+        updateDateAndCupboard();
+        loadData();
+    }, 60000);
+
 </script>
 </body>
 </html>
