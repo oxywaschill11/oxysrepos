@@ -103,7 +103,7 @@
                 border-bottom: 3px solid black; 
                 padding-bottom: 10px; 
             }
-            #print-only-header h2 { border: none; margin-bottom: 5px; color: black; }
+            #print-only-header h2 { border: none; margin-bottom: 5px; color: black; font-size: 2rem; }
             #print-only-header p { font-size: 1.2rem; font-weight: bold; margin: 0; color: #333; }
         }
     </style>
@@ -112,7 +112,7 @@
 
 <div id="print-only-header">
     <h2>BBPS Cleanliness Report</h2>
-    <p>Printed on: <span id="print-header-date"></span> | Target: Class <span id="print-header-grade">8</span></p>
+    <p>Cleanliness report for Class <span id="print-header-grade">8</span> on <span id="print-header-date"></span></p>
 </div>
 
 <header>
@@ -287,6 +287,7 @@
         const fullDateStr = now.toLocaleDateString('en-US', options);
         
         document.getElementById('current-date-display').innerText = fullDateStr;
+        // This line powers the newly formatted print header
         document.getElementById('print-header-date').innerText = fullDateStr;
 
         const isFriday = (now.getDay() === 5) || testFridayOverride; 
@@ -467,6 +468,7 @@
     function switchGrade(grade) {
         currentGrade = grade;
         document.getElementById('grade-title').innerText = `CLASS ${grade} MODE`;
+        // Updates the class number in the print header dynamically
         document.getElementById('print-header-grade').innerText = grade;
         document.getElementById('btn-7').classList.toggle('active', grade === 7);
         document.getElementById('btn-8').classList.toggle('active', grade === 8);
