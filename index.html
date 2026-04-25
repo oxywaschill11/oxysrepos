@@ -64,8 +64,8 @@ input[type="file"], input[type="text"] { width: 100%; padding: 10px; margin-bott
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // --- CONFIGURATION ---
-const OPENROUTER_API_KEY = "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";
-const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const API_KEY = "AIzaSyAOczZfIjWsgL7YhtBGuVvca5vzQTeLhhc";
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
 
 // --- PWA INSTALLATION ---
 let deferredPrompt;
@@ -85,25 +85,16 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
 }
 
-// --- OPENROUTER API CALL ---
-async function callOpenRouter(messages) {
+// --- GEMINI API CALL ---
+async function callGemini(contents) {
     const response = await fetch(API_URL, {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': window.location.href, 
-            'X-Title': 'Plant Doctor AI'          
-        },
-        body: JSON.stringify({
-            model: "google/gemini-2.0-flash-001",
-            messages: messages
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: contents })
     });
-    
-    if (!response.ok) throw new Error("API Request Failed");
+    if (!response.ok) throw new Error("API Request Failed. Check your Gemini API key.");
     const data = await response.json();
-    return data.choices[0].message.content;
+    return data.candidates[0].content.parts[0].text;
 }
 
 // --- IMAGE ANALYSIS LOGIC ---
@@ -127,19 +118,19 @@ document.getElementById('analyze-btn').addEventListener('click', async () => {
         const base64Data = reader.result.split(',')[1];
         const mimeType = file.type;
 
-        const messages = [{
-            role: "user",
-            content: [
-                { type: "text", text: "Identify plant disease and provide treatment in bullet points" },
-                { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Data}` } }
+        // Gemini's specific format for sending images
+        const contents = [{
+            parts: [
+                { text: "Identify the plant disease in this image and provide treatment options in short bullet points." },
+                { inline_data: { mime_type: mimeType, data: base64Data } }
             ]
         }];
 
         try {
-            const responseText = await callOpenRouter(messages);
+            const responseText = await callGemini(contents);
             resultDiv.innerText = responseText;
         } catch (error) {
-            resultDiv.innerText = "Error analyzing image. Check API key.";
+            resultDiv.innerText = "Error analyzing image. Please verify your Gemini API key is correct.";
         } finally {
             loadingDiv.style.display = "none";
         }
@@ -170,13 +161,14 @@ sendBtn.addEventListener('click', async () => {
     const typingIndicator = chatBox.lastChild;
 
     try {
-        const messages = [{ role: "user", content: text }];
-        const responseText = await callOpenRouter(messages);
+        // Gemini's specific format for text chat
+        const contents = [{ parts: [{ text: text }] }];
+        const responseText = await callGemini(contents);
         chatBox.removeChild(typingIndicator);
         addMessage(responseText, 'ai');
     } catch (error) {
         chatBox.removeChild(typingIndicator);
-        addMessage('Error fetching response.', 'ai');
+        addMessage('Error fetching response. Please verify your Gemini API key.', 'ai');
     }
 });
 
