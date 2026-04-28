@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Road Safety Form Quiz</title>
+<style>
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: #f0f4ff;
+}
+
+.header {
+  background: linear-gradient(90deg,#4285F4,#34A853);
+  color: white;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.form-container {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  border-left: 8px solid #4285F4;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.01);
+}
+
+.question {
+  font-size: 20px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 10px;
+  background: #f7f9ff;
+}
+
+.option:hover {
+  background: #e8f0fe;
+}
+
+.option input {
+  margin-right: 12px;
+  transform: scale(1.3);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(90deg,#4285F4,#34A853);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.submit-btn:hover {
+  transform: scale(1.03);
+}
+
+.result {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.badge {
+  font-size: 55px;
+  margin-top: 15px;
+}
+
+.progress-bar {
+  width: 100%;
+  background: #ddd;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 15px 0;
+}
+
+.progress {
+  height: 18px;
+  width: 0%;
+  background: linear-gradient(90deg,#FBBC05,#EA4335);
+  transition: 0.5s;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🚦 Road Safety Awareness Form</h1>
+  <p>Test your traffic rule knowledge!</p>
+</div>
+
+<div class="form-container">
+
+<div class="progress-bar">
+  <div class="progress" id="progress"></div>
+</div>
+
+<form id="quizForm">
+
+<div class="card">
+  <div class="question">1. What should you do at a RED traffic light?</div>
+  <label class="option"><input type="radio" name="q1" value="correct"> Stop your vehicle</label>
+  <label class="option"><input type="radio" name="q1"> Speed up</label>
+  <label class="option"><input type="radio" name="q1"> Ignore the signal</label>
+</div>
+
+<div class="card">
+  <div class="question">2. Is using a phone while driving safe?</div>
+  <label class="option"><input type="radio" name="q2"> Yes</label>
+  <label class="option"><input type="radio" name="q2" value="correct"> No</label>
+  <label class="option"><input type="radio" name="q2"> Only in traffic</label>
+</div>
+
+<div class="card">
+  <div class="question">3. Why should we wear seatbelts?</div>
+  <label class="option"><input type="radio" name="q3"> For fashion</label>
+  <label class="option"><input type="radio" name="q3" value="correct"> For safety</label>
+  <label class="option"><input type="radio" name="q3"> No reason</label>
+</div>
+
+<div class="card">
+  <div class="question">4. What does a zebra crossing mean?</div>
+  <label class="option"><input type="radio" name="q4" value="correct"> Pedestrian crossing</label>
+  <label class="option"><input type="radio" name="q4"> Racing lane</label>
+  <label class="option"><input type="radio" name="q4"> Parking area</label>
+</div>
+
+<div class="card">
+  <div class="question">5. What should cyclists wear for safety?</div>
+  <label class="option"><input type="radio" name="q5"> Sunglasses</label>
+  <label class="option"><input type="radio" name="q5" value="correct"> Helmet</label>
+  <label class="option"><input type="radio" name="q5"> Sandals</label>
+</div>
+
+<div class="card">
+  <div class="question">6. What should pedestrians do before crossing a road?</div>
+  <label class="option"><input type="radio" name="q6"> Run quickly</label>
+  <label class="option"><input type="radio" name="q6" value="correct"> Look both ways</label>
+  <label class="option"><input type="radio" name="q6"> Close eyes</label>
+</div>
+
+<div class="card">
+  <div class="question">7. What does a yellow traffic light mean?</div>
+  <label class="option"><input type="radio" name="q7"> Speed up</label>
+  <label class="option"><input type="radio" name="q7" value="correct"> Slow down and prepare to stop</label>
+  <label class="option"><input type="radio" name="q7"> Ignore it</label>
+</div>
+
+<div class="card">
+  <div class="question">8. Why is overspeeding dangerous?</div>
+  <label class="option"><input type="radio" name="q8"> It saves fuel</label>
+  <label class="option"><input type="radio" name="q8" value="correct"> It increases accident risk</label>
+  <label class="option"><input type="radio" name="q8"> It improves driving</label>
+</div>
+
+<div class="card">
+  <div class="question">9. What should you do near a school zone?</div>
+  <label class="option"><input type="radio" name="q9" value="correct"> Drive slowly</label>
+  <label class="option"><input type="radio" name="q9"> Honk loudly</label>
+  <label class="option"><input type="radio" name="q9"> Race other cars</label>
+</div>
+
+<div class="card">
+  <div class="question">10. Why are traffic signs important?</div>
+  <label class="option"><input type="radio" name="q10"> Decoration</label>
+  <label class="option"><input type="radio" name="q10" value="correct"> They guide drivers safely</label>
+  <label class="option"><input type="radio" name="q10"> Advertising</label>
+</div>
+
+<div class="card">
+  <div class="question">11. What should you do before changing lanes?</div>
+  <label class="option"><input type="radio" name="q11"> Speed up suddenly</label>
+  <label class="option"><input type="radio" name="q11" value="correct"> Check mirrors and signal</label>
+  <label class="option"><input type="radio" name="q11"> Close your eyes</label>
+</div>
+
+<div class="card">
+  <div class="question">12. What should passengers always wear?</div>
+  <label class="option"><input type="radio" name="q12"> Jacket</label>
+  <label class="option"><input type="radio" name="q12" value="correct"> Seatbelt</label>
+  <label class="option"><input type="radio" name="q12"> Hat</label>
+</div>
+
+<div class="card">
+  <div class="question">13. What should you do if an ambulance approaches?</div>
+  <label class="option"><input type="radio" name="q13"> Block the road</label>
+  <label class="option"><input type="radio" name="q13" value="correct"> Give way</label>
+  <label class="option"><input type="radio" name="q13"> Ignore it</label>
+</div>
+
+<div class="card">
+  <div class="question">14. What is the safest place for children in a car?</div>
+  <label class="option"><input type="radio" name="q14"> Front seat without belt</label>
+  <label class="option"><input type="radio" name="q14" value="correct"> Back seat with seatbelt</label>
+  <label class="option"><input type="radio" name="q14"> Standing in car</label>
+</div>
+
+<div class="card">
+  <div class="question">15. What should you do during heavy rain while driving?</div>
+  <label class="option"><input type="radio" name="q15"> Speed up</label>
+  <label class="option"><input type="radio" name="q15" value="correct"> Drive carefully and slowly</label>
+  <label class="option"><input type="radio" name="q15"> Use phone</label>
+</div>
+
+<div class="card">
+  <div class="question">16. Why should we avoid honking unnecessarily?</div>
+  <label class="option"><input type="radio" name="q16" value="correct"> It causes noise pollution</label>
+  <label class="option"><input type="radio" name="q16"> It improves traffic</label>
+  <label class="option"><input type="radio" name="q16"> It helps sleep</label>
+</div>
+
+<div class="card">
+  <div class="question">17. What color are stop signs usually?</div>
+  <label class="option"><input type="radio" name="q17" value="correct"> Red</label>
+  <label class="option"><input type="radio" name="q17"> Blue</label>
+  <label class="option"><input type="radio" name="q17"> Green</label>
+</div>
+
+<div class="card">
+  <div class="question">18. What should motorcyclists always wear?</div>
+  <label class="option"><input type="radio" name="q18"> Gloves only</label>
+  <label class="option"><input type="radio" name="q18" value="correct"> Helmet</label>
+  <label class="option"><input type="radio" name="q18"> Slippers</label>
+</div>
+
+<div class="card">
+  <div class="question">19. What should you do if traffic lights are not working?</div>
+  <label class="option"><input type="radio" name="q19"> Ignore everyone</label>
+  <label class="option"><input type="radio" name="q19" value="correct"> Follow traffic police/signs carefully</label>
+  <label class="option"><input type="radio" name="q19"> Race through</label>
+</div>
+
+<div class="card">
+  <div class="question">20. Why should roads be kept clean and obstacle free?</div>
+  <label class="option"><input type="radio" name="q20" value="correct"> To prevent accidents</label>
+  <label class="option"><input type="radio" name="q20"> For decoration only</label>
+  <label class="option"><input type="radio" name="q20"> To block traffic</label>
+</div>
+
+<button type="button" class="submit-btn" onclick="checkAnswers()">Submit Form 🚀</button>
+
+</form>
+
+<div class="result" id="result"></div>
+<div class="badge" id="badge"></div>
+
+</div>
+
+<script>
+function checkAnswers() {
+  let correct = document.querySelectorAll('input[value="correct"]:checked').length;
+  let total = 20;
+  let percent = (correct/total)*100;
+
+  document.getElementById('progress').style.width = percent + '%';
+
+  let resultText = `🎯 Your Score: ${correct}/${total}`;
+  document.getElementById('result').innerHTML = resultText;
+
+  let badge = '';
+
+  if(correct === 4){
+    badge = '🏆 Traffic Safety Champion';
+  }
+  else if(correct >= 2){
+    badge = '🚗 Safe Driver';
+  }
+  else {
+    badge = '⚠️ Learn More Traffic Rules';
+  }
+
+  document.getElementById('badge').innerHTML = badge;
+
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
