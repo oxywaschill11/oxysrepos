@@ -31,8 +31,8 @@
         #current-date-display { font-size: 1.1rem; font-weight: 600; background: rgba(0,0,0,0.2); display: inline-block; padding: 5px 15px; border-radius: 50px; margin-top: 10px; }
 
         /* Grade Toggle */
-        .grade-toggle-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
-        .grade-btn { padding: 12px 35px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; font-size: 1.2rem; transition: all 0.3s; background: #cbd5e1; color: #475569; }
+        .grade-toggle-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;}
+        .grade-btn { padding: 12px 30px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; font-size: 1.1rem; transition: all 0.3s; background: #cbd5e1; color: #475569; }
         .grade-btn.active { background: var(--dark); color: white; transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
         /* Marquee */
@@ -93,9 +93,8 @@
             .results-section { width: 100%; }
             body { background: white; padding: 0; }
             .card { box-shadow: none; border: 2px solid #000; break-inside: avoid; }
-            header { display: none !important; } /* Hide the colorful web header */
+            header { display: none !important; } 
             
-            /* Show the clean, date-stamped print header */
             #print-only-header { 
                 display: block !important; 
                 text-align: center; 
@@ -128,6 +127,7 @@
 <div class="grade-toggle-container">
     <button class="grade-btn active" id="btn-8" onclick="switchGrade(8)">CLASS 8</button>
     <button class="grade-btn" id="btn-7" onclick="switchGrade(7)">CLASS 7</button>
+    <button class="grade-btn" id="btn-6" onclick="switchGrade(6)">CLASS 6</button>
 </div>
 
 <div class="container">
@@ -135,19 +135,16 @@
         <button class="admin-login-btn" id="login-btn" onclick="loginEditor()">🛠️ UNLOCK ADMIN PANEL</button>
         <div id="editor-panel">
             <div style="background:var(--danger); color:white; padding:10px; text-align:center; font-weight:bold; border-radius:8px; margin-bottom: 10px;">ADMIN ACTIVE</div>
-            <label>✏️ Edit Live Dashboard Points:</label>
+            <label>✏️ Edit Today's Live Dashboard Points:</label>
             <div style="display:flex; gap:10px;">
                 <select id="edit-section" style="width: 50%;">
-                    <option value="A">A</option> <option value="B">B</option> <option value="C">C</option>
-                    <option value="D">D</option> <option value="E">E</option> <option value="F">F</option>
-                    <option value="G">G</option> <option value="H">H</option> <option value="I">I</option>
-                </select>
+                    </select>
                 <input type="number" id="edit-score" placeholder="Total Score" style="width: 50%;">
             </div>
             <button class="submit-btn" style="margin-top:10px; padding:10px; background:var(--dark);" onclick="forceSave()">💾 Update Dashboard Chart</button>
             <hr style="margin: 15px 0; border:1px solid #fecdd3;">
             <button class="admin-action-btn" style="background:#8b5cf6;" onclick="manualEndWeek()">🏆 Force End Week Early</button>
-            <button class="admin-action-btn" style="background: #eab308; margin-top: 15px;" onclick="clearCurrentPoints()">🧹 Clear Current Live Board</button>
+            <button class="admin-action-btn" style="background: #eab308; margin-top: 15px;" onclick="clearCurrentPoints()">🧹 Clear Today's Live Board</button>
             <button class="admin-action-btn" onclick="resetPeriod('month')">⚠️ Reset Monthly History</button>
             <button class="admin-action-btn" style="background: #ef4444;" onclick="resetPeriod('year')">⚠️ Reset Yearly History</button>
             <button class="admin-action-btn" style="background: #10b981; margin-top: 15px;" onclick="forceFriday()">🧪 Toggle Friday Test Mode</button>
@@ -159,10 +156,7 @@
             <h2>📝 Judge's Panel</h2>
             <label>Select Section</label>
             <select id="section-selector" onchange="checkIfScored()">
-                <option value="A">Section A</option> <option value="B">Section B</option> <option value="C">Section C</option>
-                <option value="D">Section D</option> <option value="E">Section E</option> <option value="F">Section F</option>
-                <option value="G">Section G</option> <option value="H">Section H</option> <option value="I">Section I</option>
-            </select>
+                </select>
 
             <label>🚰 Water Spilled (0-5)</label>
             <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -182,6 +176,12 @@
                 <span id="d-arrange" class="score-display">0</span>
             </div>
 
+            <label>🧽 Cleanliness on Table (0-5)</label>
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+                <input type="range" id="s-cleantable" min="0" max="5" value="0" oninput="updateDisp()">
+                <span id="d-cleantable" class="score-display">0</span>
+            </div>
+
             <div id="cupboard-section" style="display: none; background: #fffbeb; padding: 10px; border-radius: 10px; border: 2px dashed #fbbf24; margin-top: 15px;">
                 <label style="color: #b45309; margin-top:0;">🚪 Cupboard Check (Friday Mode)</label>
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px;">
@@ -199,7 +199,7 @@
             </div>
 
             <div style="text-align:center; margin-top:20px; font-size:1.1rem; font-weight:800; background:#f1f5f9; padding:10px; border-radius:10px;">
-                Total Points: <span id="total-val" style="color:var(--primary); font-size:1.5rem;">0</span> / <span id="total-val-max">15</span>
+                Total Points: <span id="total-val" style="color:var(--primary); font-size:1.5rem;">0</span> / <span id="total-val-max">20</span>
             </div>
             
             <button id="award-btn" class="submit-btn" onclick="addPoints()">✅ Award Points</button>
@@ -236,7 +236,7 @@
         </div>
 
         <div class="card">
-            <h2>📊 Cumulative Total (Live Board)</h2>
+            <h2>📊 Today's Cumulative Points (Live Board)</h2>
             <canvas id="cleanChart"></canvas>
         </div>
 
@@ -262,16 +262,34 @@
 <script>
     let testFridayOverride = false;
     let currentGrade = 8;
-    const sections = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+    
+    // Define sections per grade
+    const gradeSections = {
+        6: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
+        7: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
+        8: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+    };
+
     let chartMain;
     let chartWeekly;
 
-    // Mapping for categorical chart
-    const secToNum = { 'A':9, 'B':8, 'C':7, 'D':6, 'E':5, 'F':4, 'G':3, 'H':2, 'I':1 };
-    const numToSec = { 9:'A', 8:'B', 7:'C', 6:'D', 5:'E', 4:'F', 3:'G', 2:'H', 1:'I' };
+    // Mapping for categorical chart (J is added)
+    const secToNum = { 'A':10, 'B':9, 'C':8, 'D':7, 'E':6, 'F':5, 'G':4, 'H':3, 'I':2, 'J':1 };
+    const numToSec = { 10:'A', 9:'B', 8:'C', 7:'D', 6:'E', 5:'F', 4:'G', 3:'H', 2:'I', 1:'J' };
 
     function getFormattedDateShort() {
         return new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function populateSections() {
+        const secSelect = document.getElementById('section-selector');
+        const editSelect = document.getElementById('edit-section');
+        secSelect.innerHTML = '';
+        editSelect.innerHTML = '';
+        gradeSections[currentGrade].forEach(sec => {
+            secSelect.innerHTML += `<option value="${sec}">Section ${sec}</option>`;
+            editSelect.innerHTML += `<option value="${sec}">${sec}</option>`;
+        });
     }
 
     function toggleCupboard() {
@@ -287,7 +305,6 @@
         const fullDateStr = now.toLocaleDateString('en-US', options);
         
         document.getElementById('current-date-display').innerText = fullDateStr;
-        // This line powers the newly formatted print header
         document.getElementById('print-header-date').innerText = fullDateStr;
 
         const isFriday = (now.getDay() === 5) || testFridayOverride; 
@@ -316,6 +333,9 @@
         if(scoredData.date !== todayDate) {
             scoredData = { date: todayDate, sections: [] };
             localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify(scoredData));
+            
+            // Also explicitly reset the Daily Liveboard if date changed!
+            localStorage.setItem(`bbps_daily_pts_${currentGrade}`, JSON.stringify({ date: todayDate, scores: {} }));
         }
 
         const awardBtn = document.getElementById('award-btn');
@@ -373,18 +393,27 @@
         let sMonth = localStorage.getItem('bbps_cur_mo') || curMonth;
         let sYear = localStorage.getItem('bbps_cur_yr') || curYear;
 
+        // Data Migration: Ensure old 'scores' transfer to 'w_scores' so data isn't lost on code update
+        [6, 7, 8].forEach(g => {
+            let oldScores = localStorage.getItem(`bbps_scores_${g}`);
+            if (oldScores) {
+                localStorage.setItem(`bbps_w_scores_${g}`, oldScores);
+                localStorage.removeItem(`bbps_scores_${g}`); 
+            }
+        });
+
         // Auto End Week
         if (sWeek !== curWeek || (now.getDay() === 0 && localStorage.getItem('bbps_sunday_lock') !== curWeek)) {
-            [7, 8].forEach(g => {
-                let scores = JSON.parse(localStorage.getItem(`bbps_scores_${g}`)) || {};
-                let winner = getTopScorer(scores);
+            [6, 7, 8].forEach(g => {
+                let wScores = JSON.parse(localStorage.getItem(`bbps_w_scores_${g}`)) || {};
+                let winner = getTopScorer(wScores);
                 if (winner !== "-") {
                     localStorage.setItem(`bbps_last_week_winner_${g}`, winner);
                     let hist = JSON.parse(localStorage.getItem(`bbps_history_${g}`)) || [];
                     hist.unshift({ date: getFormattedDateShort(), winner: winner });
                     localStorage.setItem(`bbps_history_${g}`, JSON.stringify(hist));
                 }
-                localStorage.removeItem(`bbps_scores_${g}`);
+                localStorage.removeItem(`bbps_w_scores_${g}`);
                 localStorage.removeItem(`bbps_week_daily_wins_${g}`);
             });
             localStorage.setItem('bbps_sunday_lock', curWeek);
@@ -392,7 +421,7 @@
         }
 
         if (sMonth !== curMonth) {
-            [7, 8].forEach(g => {
+            [6, 7, 8].forEach(g => {
                 let mScores = JSON.parse(localStorage.getItem(`bbps_m_scores_${g}`)) || {};
                 let winner = getTopScorer(mScores);
                 if(winner !== "-") localStorage.setItem(`bbps_last_month_winner_${g}`, winner);
@@ -402,7 +431,7 @@
         }
 
         if (sYear !== curYear) {
-            [7, 8].forEach(g => {
+            [6, 7, 8].forEach(g => {
                 let yScores = JSON.parse(localStorage.getItem(`bbps_y_scores_${g}`)) || {};
                 let winner = getTopScorer(yScores);
                 if(winner !== "-") localStorage.setItem(`bbps_last_year_winner_${g}`, winner);
@@ -417,10 +446,11 @@
         chartMain = new Chart(ctx1, {
             type: 'bar',
             data: {
-                labels: sections,
+                labels: gradeSections[8],
                 datasets: [{ 
-                    label: 'Total Points', data: new Array(9).fill(0), 
-                    backgroundColor: ['#4ADE80', '#38BDF8', '#F472B6', '#A78BFA', '#FBBF24', '#4ADE80', '#38BDF8', '#F472B6', '#A78BFA'],
+                    label: "Today's Points", 
+                    data: new Array(gradeSections[8].length).fill(0), 
+                    backgroundColor: ['#4ADE80', '#38BDF8', '#F472B6', '#A78BFA', '#FBBF24', '#4ADE80', '#38BDF8', '#F472B6', '#A78BFA', '#ef4444'],
                     borderRadius: 5
                 }]
             },
@@ -443,7 +473,7 @@
                 scales: { 
                     y: { 
                         min: 1, 
-                        max: 9,
+                        max: 10,
                         ticks: {
                             stepSize: 1,
                             callback: function(value) { return numToSec[value] || ''; } 
@@ -468,10 +498,13 @@
     function switchGrade(grade) {
         currentGrade = grade;
         document.getElementById('grade-title').innerText = `CLASS ${grade} MODE`;
-        // Updates the class number in the print header dynamically
         document.getElementById('print-header-grade').innerText = grade;
+        
+        document.getElementById('btn-6').classList.toggle('active', grade === 6);
         document.getElementById('btn-7').classList.toggle('active', grade === 7);
         document.getElementById('btn-8').classList.toggle('active', grade === 8);
+        
+        populateSections();
         loadData();
         checkIfScored(); 
     }
@@ -480,16 +513,20 @@
         const w = parseInt(document.getElementById('s-water').value);
         const p = parseInt(document.getElementById('s-paper').value);
         const a = parseInt(document.getElementById('s-arrange').value);
+        const t = parseInt(document.getElementById('s-cleantable').value);
         const cupSlider = document.getElementById('s-cupboard');
         const c = (!cupSlider.disabled) ? parseInt(cupSlider.value) : 0;
         
         document.getElementById('d-water').innerText = w;
         document.getElementById('d-paper').innerText = p;
         document.getElementById('d-arrange').innerText = a;
+        document.getElementById('d-cleantable').innerText = t;
         document.getElementById('d-cupboard').innerText = c;
-        document.getElementById('total-val').innerText = w + p + a + c;
         
-        document.getElementById('total-val-max').innerText = document.getElementById('cupboard-toggle').checked && document.getElementById('cupboard-section').style.display === "block" ? "20" : "15";
+        document.getElementById('total-val').innerText = w + p + a + t + c;
+        
+        // Max points are now 20 base, plus 5 for cupboard on Fridays (25 total)
+        document.getElementById('total-val-max').innerText = document.getElementById('cupboard-toggle').checked && document.getElementById('cupboard-section').style.display === "block" ? "25" : "20";
     }
 
     function addPoints() {
@@ -497,28 +534,32 @@
         const pts = parseInt(document.getElementById('total-val').innerText);
         const todayDate = getFormattedDateShort();
 
-        let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
+        // Weekly, Monthly, Yearly Background Accumulation
+        let wScores = JSON.parse(localStorage.getItem(`bbps_w_scores_${currentGrade}`)) || {};
         let mScores = JSON.parse(localStorage.getItem(`bbps_m_scores_${currentGrade}`)) || {};
         let yScores = JSON.parse(localStorage.getItem(`bbps_y_scores_${currentGrade}`)) || {};
         
-        scores[sec] = (scores[sec] || 0) + pts;
+        wScores[sec] = (wScores[sec] || 0) + pts;
         mScores[sec] = (mScores[sec] || 0) + pts;
         yScores[sec] = (yScores[sec] || 0) + pts;
         
-        localStorage.setItem(`bbps_scores_${currentGrade}`, JSON.stringify(scores));
+        localStorage.setItem(`bbps_w_scores_${currentGrade}`, JSON.stringify(wScores));
         localStorage.setItem(`bbps_m_scores_${currentGrade}`, JSON.stringify(mScores));
         localStorage.setItem(`bbps_y_scores_${currentGrade}`, JSON.stringify(yScores));
 
+        // Today's Live Board Accumulation
         let dailyScores = JSON.parse(localStorage.getItem(`bbps_daily_pts_${currentGrade}`)) || { date: todayDate, scores: {} };
         if (dailyScores.date !== todayDate) dailyScores = { date: todayDate, scores: {} };
-        dailyScores.scores[sec] = pts;
+        dailyScores.scores[sec] = (dailyScores.scores[sec] || 0) + pts;
         localStorage.setItem(`bbps_daily_pts_${currentGrade}`, JSON.stringify(dailyScores));
 
+        // Mark section as scored for today
         let scoredData = JSON.parse(localStorage.getItem(`bbps_scored_today_${currentGrade}`)) || { date: todayDate, sections: [] };
         if(!scoredData.sections.includes(sec)) scoredData.sections.push(sec);
         localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify(scoredData));
 
-        if (scoredData.sections.length >= sections.length) {
+        // Check if all sections for the grade are scored
+        if (scoredData.sections.length >= gradeSections[currentGrade].length) {
             let todayWinner = getTopScorer(dailyScores.scores);
             localStorage.setItem(`bbps_win_${currentGrade}`, todayWinner);
             localStorage.setItem(`bbps_win_date_${currentGrade}`, todayDate);
@@ -534,9 +575,11 @@
             localStorage.setItem(`bbps_win_date_${currentGrade}`, "Waiting on all classes");
         }
 
+        // Reset sliders
         document.getElementById('s-water').value = 0;
         document.getElementById('s-paper').value = 0;
         document.getElementById('s-arrange').value = 0;
+        document.getElementById('s-cleantable').value = 0;
         document.getElementById('s-cupboard').value = 0;
         document.getElementById('cupboard-toggle').checked = false;
         toggleCupboard();
@@ -547,10 +590,18 @@
 
     function loadData() {
         const todayDate = getFormattedDateShort();
+        const currentGradeSections = gradeSections[currentGrade];
 
-        // Update Chart 1
-        let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
-        chartMain.data.datasets[0].data = sections.map(s => scores[s] || 0);
+        // Ensure Daily Score object is fresh
+        let dailyScores = JSON.parse(localStorage.getItem(`bbps_daily_pts_${currentGrade}`)) || { date: todayDate, scores: {} };
+        if (dailyScores.date !== todayDate) {
+            dailyScores = { date: todayDate, scores: {} };
+            localStorage.setItem(`bbps_daily_pts_${currentGrade}`, JSON.stringify(dailyScores));
+        }
+
+        // Update Chart 1 (Now purely daily liveboard)
+        chartMain.data.labels = currentGradeSections;
+        chartMain.data.datasets[0].data = currentGradeSections.map(s => dailyScores.scores[s] || 0);
         chartMain.update();
 
         // Update Chart 2
@@ -562,18 +613,16 @@
         // --- MIDNIGHT RESET / STRICT DAILY WINNER LOGIC ---
         let scoredData = JSON.parse(localStorage.getItem(`bbps_scored_today_${currentGrade}`)) || { date: "", sections: [] };
         
-        // If it's a new day, or we haven't scored all 9 sections today: Show Pending.
-        if (scoredData.date !== todayDate || scoredData.sections.length < sections.length) {
+        // If it's a new day, or we haven't scored all sections today: Show Pending.
+        if (scoredData.date !== todayDate || scoredData.sections.length < currentGradeSections.length) {
             document.getElementById('badge-daily').innerText = "⏳ Pending...";
             document.getElementById('badge-daily-date').innerText = "Waiting on all classes";
             
-            // Clean up stale winner storage if it's from yesterday
             if (scoredData.date !== todayDate) {
                 localStorage.setItem(`bbps_win_${currentGrade}`, "⏳ Pending...");
                 localStorage.setItem(`bbps_win_date_${currentGrade}`, "Waiting on all classes");
             }
         } else {
-            // All 9 scored today! Show the exact winner.
             document.getElementById('badge-daily').innerText = localStorage.getItem(`bbps_win_${currentGrade}`);
             document.getElementById('badge-daily-date').innerText = localStorage.getItem(`bbps_win_date_${currentGrade}`);
         }
@@ -616,19 +665,20 @@
         const val = parseInt(document.getElementById('edit-score').value);
         if(isNaN(val)) return;
 
-        let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
-        scores[sec] = val;
-        localStorage.setItem(`bbps_scores_${currentGrade}`, JSON.stringify(scores));
+        const todayDate = getFormattedDateShort();
+        let dailyScores = JSON.parse(localStorage.getItem(`bbps_daily_pts_${currentGrade}`)) || { date: todayDate, scores: {} };
+        dailyScores.scores[sec] = val;
+        localStorage.setItem(`bbps_daily_pts_${currentGrade}`, JSON.stringify(dailyScores));
         
         document.getElementById('edit-score').value = "";
-        alert(`✅ Live Dashboard updated for Section ${sec}!`);
+        alert(`✅ Today's Live Dashboard updated for Section ${sec}!`);
         loadData();
     }
 
     function manualEndWeek() {
         if(!confirm(`⚠️ Force End Week?\nThis saves the current leader as Last Week's Winner and resets the live boards.`)) return;
-        let scores = JSON.parse(localStorage.getItem(`bbps_scores_${currentGrade}`)) || {};
-        let leader = getTopScorer(scores);
+        let wScores = JSON.parse(localStorage.getItem(`bbps_w_scores_${currentGrade}`)) || {};
+        let leader = getTopScorer(wScores);
         
         if (leader !== "-") {
             localStorage.setItem(`bbps_last_week_winner_${currentGrade}`, leader);
@@ -636,20 +686,22 @@
             hist.unshift({ date: getFormattedDateShort(), winner: leader });
             localStorage.setItem(`bbps_history_${currentGrade}`, JSON.stringify(hist));
         }
-        localStorage.removeItem(`bbps_scores_${currentGrade}`);
+        localStorage.removeItem(`bbps_w_scores_${currentGrade}`);
         localStorage.removeItem(`bbps_week_daily_wins_${currentGrade}`);
         loadData();
         confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
     }
 
     function clearCurrentPoints() {
-        if(!confirm(`⚠️ Are you sure you want to completely WIPE all points for Class ${currentGrade} on the live board?\n\nThis cannot be undone!`)) return;
-        localStorage.removeItem(`bbps_scores_${currentGrade}`);
+        if(!confirm(`⚠️ Are you sure you want to completely WIPE today's live board points for Class ${currentGrade}?\n\nThis cannot be undone!`)) return;
+        
         const todayDate = getFormattedDateShort();
+        localStorage.setItem(`bbps_daily_pts_${currentGrade}`, JSON.stringify({ date: todayDate, scores: {} }));
         localStorage.setItem(`bbps_scored_today_${currentGrade}`, JSON.stringify({ date: todayDate, sections: [] }));
+        
         loadData();
         checkIfScored();
-        alert(`✅ Live board for Class ${currentGrade} has been reset to 0!`);
+        alert(`✅ Today's Live board for Class ${currentGrade} has been reset to 0!`);
     }
 
     function resetPeriod(type) {
@@ -665,15 +717,18 @@
     function forceFriday() {
         testFridayOverride = !testFridayOverride;
         updateDateAndCupboard();
-        alert(testFridayOverride ? "🧪  Friday Mode ON! Cupboard menu visible." : "🛑 Friday Mode OFF! Returned to real day.");
+        alert(testFridayOverride ? "🧪  Friday Mode ON! Cupboard menu visible." : "🛑 Test Mode OFF! Returned to real day.");
     }
 
     // Init App
     runAutoRollovers();
     generateQuotes();
-    updateDateAndCupboard();
+    populateSections();
     initCharts();
-    loadData();
+    
+    // Default load class 8 on start
+    switchGrade(8);
+    updateDateAndCupboard();
 
     // BACKGROUND TIMER: Automatically checks for midnight date-change every 60 seconds
     setInterval(() => {
